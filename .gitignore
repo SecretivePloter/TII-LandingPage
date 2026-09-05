@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Local env — NEVER commit real keys (service role key especially)
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.log

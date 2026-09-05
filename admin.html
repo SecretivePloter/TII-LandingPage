@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- WAJIB: jangan sampai ke-index -->
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — Trading Insights Indonesia</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          navy: { base: '#0A0E14', deep: '#0D1119', card: '#131A24', line: '#1E2836' },
+          gold: { DEFAULT: '#C9A24B', light: '#D4AF6A' },
+          teal: '#2E7D6B', danger: '#c0564b', ink: '#E8E6E1',
+        },
+      } },
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    body { font-family: 'Instrument Sans', system-ui, sans-serif; background: #0A0E14; color: #E8E6E1; }
+    .mono { font-family: 'Spline Sans Mono', monospace; }
+    .card { background: #131A24; border: 1px solid #1E2836; }
+    .drag-over { outline: 2px dashed #C9A24B; outline-offset: 2px; }
+    .dragging { opacity: .4; }
+    ::selection { background: rgba(201,162,75,.3); }
+  </style>
+</head>
+<body class="antialiased min-h-screen">
+
+  <!-- ============================ LOGIN ============================ -->
+  <div id="loginView" class="min-h-screen grid place-items-center px-5">
+    <div class="w-full max-w-sm">
+      <div class="flex items-center gap-2.5 justify-center mb-8">
+        <span class="grid place-items-center w-9 h-9 rounded-lg card">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-gold-light" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 3 3 4-6 4 4"/><path d="M14 9h5v5"/></svg>
+        </span>
+        <span class="font-semibold">Admin Panel</span>
+      </div>
+
+      <form id="loginForm" class="card rounded-2xl p-6 space-y-4">
+        <div>
+          <label class="block text-sm text-ink/70 mb-1.5">Password admin</label>
+          <input id="passwordInput" type="password" autocomplete="current-password" required
+                 class="w-full rounded-lg bg-navy-deep border border-navy-line px-3.5 py-2.5 text-sm outline-none focus:border-gold/60" />
+        </div>
+        <button type="submit" id="loginBtn"
+                class="w-full rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-navy-base hover:bg-gold-light transition disabled:opacity-50">
+          Masuk
+        </button>
+        <p id="loginError" class="text-sm text-danger hidden"></p>
+      </form>
+      <p class="mt-4 text-center text-xs text-ink/40">Halaman ini tidak diindeks mesin pencari.</p>
+    </div>
+  </div>
+
+  <!-- ============================ DASHBOARD ============================ -->
+  <div id="dashView" class="hidden">
+    <header class="border-b border-navy-line/60 bg-navy-deep/80 backdrop-blur sticky top-0 z-30">
+      <div class="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="grid place-items-center w-8 h-8 rounded-lg card">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-gold-light" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 3 3 4-6 4 4"/><path d="M14 9h5v5"/></svg>
+          </span>
+          <span class="font-semibold text-sm">Asset Manager</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/" target="_blank" class="text-xs text-ink/60 hover:text-ink transition">Lihat landing ↗</a>
+          <button id="logoutBtn" class="text-xs rounded-lg card px-3 py-1.5 hover:border-gold/40 transition">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-5 py-8">
+      <!-- Tabs -->
+      <div id="tabs" class="flex flex-wrap gap-2 mb-8">
+        <button data-tab="testimoni" class="tab rounded-lg px-4 py-2 text-sm card">Testimoni</button>
+        <button data-tab="hasil-tp"  class="tab rounded-lg px-4 py-2 text-sm card">Hasil TP</button>
+        <button data-tab="winrate"   class="tab rounded-lg px-4 py-2 text-sm card">Winrate</button>
+        <button data-tab="analyst"   class="tab rounded-lg px-4 py-2 text-sm card">Analyst</button>
+      </div>
+
+      <!-- Upload -->
+      <section class="card rounded-2xl p-6 mb-8">
+        <h2 class="font-semibold mb-4">Upload gambar baru — <span id="uploadCatLabel" class="text-gold-light">testimoni</span></h2>
+        <div id="dropzone" class="rounded-xl border-2 border-dashed border-navy-line hover:border-gold/50 transition cursor-pointer p-8 text-center">
+          <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden" />
+          <svg class="w-9 h-9 mx-auto text-ink/40 mb-3" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          <p class="text-sm text-ink/70">Klik atau drag gambar ke sini</p>
+          <p class="text-xs text-ink/40 mt-1">JPG / PNG / WEBP / GIF · maks ~3MB</p>
+        </div>
+        <div id="preview" class="hidden mt-4">
+          <img id="previewImg" class="max-h-40 rounded-lg border border-navy-line" alt="preview" />
+          <div class="mt-3 space-y-3">
+            <input id="captionInput" type="text" placeholder="Caption (opsional)" maxlength="500"
+                   class="w-full rounded-lg bg-navy-deep border border-navy-line px-3.5 py-2.5 text-sm outline-none focus:border-gold/60" />
+            <div class="flex gap-2">
+              <button id="uploadBtn" class="rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-navy-base hover:bg-gold-light transition disabled:opacity-50">Upload</button>
+              <button id="cancelUpload" class="rounded-lg card px-5 py-2.5 text-sm hover:border-gold/40 transition">Batal</button>
+            </div>
+          </div>
+        </div>
+        <p id="uploadMsg" class="mt-3 text-sm hidden"></p>
+      </section>
+
+      <!-- List -->
+      <section>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold">Asset tersimpan</h2>
+          <span class="text-xs text-ink/40">Drag kartu untuk atur urutan · ✎ edit caption · 🗑 hapus</span>
+        </div>
+        <div id="assetList" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        <p id="listMsg" class="mt-4 text-sm text-ink/50"></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const TOKEN_KEY = 'tii_admin_token';
+    let token = sessionStorage.getItem(TOKEN_KEY) || null;
+    let sb = null;                 // supabase client (anon, buat read)
+    let currentCat = 'testimoni';
+    let pendingFile = null;        // { base64, filename, contentType }
+
+    const $ = (id) => document.getElementById(id);
+
+    /* ---------- API helper ---------- */
+    async function api(path, method, body) {
+      const res = await fetch(path, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) { forceLogout(); throw new Error(data.error || 'Sesi habis.'); }
+      if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      return data;
+    }
+
+    /* ---------- Supabase anon client (read only) ---------- */
+    async function initSupabase() {
+      if (sb) return sb;
+      const res = await fetch('/api/config');
+      if (!res.ok) throw new Error('Gagal ambil config Supabase.');
+      const cfg = await res.json();
+      sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+      return sb;
+    }
+
+    /* ---------- Views ---------- */
+    function showDash() { $('loginView').classList.add('hidden'); $('dashView').classList.remove('hidden'); }
+    function showLogin() { $('dashView').classList.add('hidden'); $('loginView').classList.remove('hidden'); }
+    function forceLogout() { token = null; sessionStorage.removeItem(TOKEN_KEY); showLogin(); }
+
+    /* ---------- Login ---------- */
+    $('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = $('loginError'); err.classList.add('hidden');
+      $('loginBtn').disabled = true;
+      try {
+        const res = await fetch('/api/admin-login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: $('passwordInput').value }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Login gagal.');
+        token = data.token; sessionStorage.setItem(TOKEN_KEY, token);
+        $('passwordInput').value = '';
+        await enterDashboard();
+      } catch (ex) {
+        err.textContent = ex.message; err.classList.remove('hidden');
+      } finally {
+        $('loginBtn').disabled = false;
+      }
+    });
+
+    $('logoutBtn').addEventListener('click', forceLogout);
+
+    async function enterDashboard() {
+      showDash();
+      try { await initSupabase(); } catch (ex) { $('listMsg').textContent = ex.message; }
+      setTab(currentCat);
+    }
+
+    /* ---------- Tabs ---------- */
+    function setTab(cat) {
+      currentCat = cat;
+      document.querySelectorAll('.tab').forEach(t => {
+        const active = t.dataset.tab === cat;
+        t.classList.toggle('bg-gold', active);
+        t.classList.toggle('text-navy-base', active);
+        t.classList.toggle('font-semibold', active);
+        t.classList.toggle('border-gold', active);
+      });
+      $('uploadCatLabel').textContent = cat;
+      resetUpload();
+      loadList();
+    }
+    document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
+
+    /* ---------- Upload flow ---------- */
+    const dropzone = $('dropzone'), fileInput = $('fileInput');
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault(); dropzone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+
+    function handleFile(file) {
+      const msg = $('uploadMsg'); msg.classList.add('hidden');
+      if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
+        return showUploadMsg('Format harus JPG, PNG, WEBP, atau GIF.', true);
+      }
+      if (file.size > 3 * 1024 * 1024) {
+        return showUploadMsg('File > 3MB. Kompres dulu ya (batas serverless).', true);
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = String(reader.result).split(',')[1];
+        pendingFile = { base64, filename: file.name, contentType: file.type };
+        $('previewImg').src = reader.result;
+        $('preview').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    $('cancelUpload').addEventListener('click', resetUpload);
+    function resetUpload() {
+      pendingFile = null; fileInput.value = '';
+      $('preview').classList.add('hidden'); $('previewImg').src = '';
+      $('captionInput').value = ''; $('uploadMsg').classList.add('hidden');
+    }
+
+    $('uploadBtn').addEventListener('click', async () => {
+      if (!pendingFile) return;
+      $('uploadBtn').disabled = true;
+      showUploadMsg('Mengupload…', false);
+      try {
+        await api('/api/admin-upload', 'POST', {
+          category: currentCat,
+          caption: $('captionInput').value,
+          filename: pendingFile.filename,
+          contentType: pendingFile.contentType,
+          dataBase64: pendingFile.base64,
+        });
+        showUploadMsg('Berhasil diupload ✓', false);
+        resetUpload();
+        loadList();
+      } catch (ex) {
+        showUploadMsg(ex.message, true);
+      } finally {
+        $('uploadBtn').disabled = false;
+      }
+    });
+
+    function showUploadMsg(text, isErr) {
+      const m = $('uploadMsg');
+      m.textContent = text; m.classList.remove('hidden');
+      m.classList.toggle('text-danger', !!isErr);
+      m.classList.toggle('text-teal', !isErr);
+    }
+
+    /* ---------- List + edit + reorder + delete ---------- */
+    async function loadList() {
+      const wrap = $('assetList'); const msg = $('listMsg');
+      wrap.innerHTML = ''; msg.textContent = 'Memuat…';
+      try {
+        await initSupabase();
+        const { data, error } = await sb.from('assets').select('*')
+          .eq('category', currentCat).order('display_order', { ascending: true });
+        if (error) throw error;
+        if (!data.length) { msg.textContent = 'Belum ada asset di kategori ini.'; return; }
+        msg.textContent = '';
+        data.forEach(a => wrap.appendChild(assetCard(a)));
+      } catch (ex) {
+        msg.textContent = 'Gagal memuat: ' + ex.message;
+      }
+    }
+
+    function assetCard(a) {
+      const el = document.createElement('div');
+      el.className = 'card rounded-xl overflow-hidden group relative';
+      el.draggable = true;
+      el.dataset.id = a.id;
+      el.innerHTML =
+        '<img src="' + a.file_url + '" alt="" class="w-full aspect-[4/5] object-cover" />' +
+        '<div class="p-2.5">' +
+          '<p class="text-xs text-ink/70 line-clamp-2 min-h-[2rem]">' + (a.caption ? escapeHtml(a.caption) : '<span class="text-ink/30">Tanpa caption</span>') + '</p>' +
+          '<div class="mt-2 flex items-center gap-2">' +
+            '<button class="edit-btn text-xs rounded card px-2 py-1 hover:border-gold/40">✎ Edit</button>' +
+            '<button class="del-btn text-xs rounded card px-2 py-1 hover:border-danger hover:text-danger">🗑</button>' +
+            '<span class="ml-auto mono text-[10px] text-ink/30">#' + a.display_order + '</span>' +
+          '</div>' +
+        '</div>';
+
+      el.querySelector('.edit-btn').addEventListener('click', () => editCaption(a, el));
+      el.querySelector('.del-btn').addEventListener('click', () => deleteAsset(a, el));
+      wireDrag(el);
+      return el;
+    }
+
+    async function editCaption(a, el) {
+      const next = window.prompt('Caption baru:', a.caption || '');
+      if (next === null) return;
+      try {
+        await api('/api/admin-asset', 'PATCH', { id: a.id, caption: next });
+        a.caption = next;
+        el.querySelector('p').innerHTML = next ? escapeHtml(next) : '<span class="text-ink/30">Tanpa caption</span>';
+      } catch (ex) { alert('Gagal edit: ' + ex.message); }
+    }
+
+    async function deleteAsset(a, el) {
+      if (!window.confirm('Hapus asset ini? File & datanya hilang permanen.')) return;
+      try {
+        await api('/api/admin-asset', 'DELETE', { id: a.id });
+        el.remove();
+        if (!$('assetList').children.length) $('listMsg').textContent = 'Belum ada asset di kategori ini.';
+      } catch (ex) { alert('Gagal hapus: ' + ex.message); }
+    }
+
+    /* ---------- Drag to reorder ---------- */
+    let dragEl = null;
+    function wireDrag(el) {
+      el.addEventListener('dragstart', () => { dragEl = el; el.classList.add('dragging'); });
+      el.addEventListener('dragend', async () => {
+        el.classList.remove('dragging');
+        document.querySelectorAll('.drag-over').forEach(e => e.classList.remove('drag-over'));
+        await persistOrder();
+      });
+      el.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const wrap = $('assetList');
+        const after = getDragAfter(wrap, e.clientY, e.clientX);
+        if (after == null) wrap.appendChild(dragEl); else wrap.insertBefore(dragEl, after);
+      });
+    }
+    function getDragAfter(wrap, y, x) {
+      const cards = [...wrap.querySelectorAll('[draggable]:not(.dragging)')];
+      let closest = { dist: -Infinity, el: null };
+      for (const c of cards) {
+        const box = c.getBoundingClientRect();
+        // urut baris-lalu-kolom: pakai titik tengah kartu
+        const offset = (y - (box.top + box.height / 2)) + (x - (box.left + box.width / 2)) * 0.001;
+        if (offset < 0 && offset > closest.dist) closest = { dist: offset, el: c };
+      }
+      return closest.el;
+    }
+    async function persistOrder() {
+      const items = [...$('assetList').querySelectorAll('[data-id]')].map((el, i) => {
+        el.querySelector('.mono').textContent = '#' + i;
+        return { id: el.dataset.id, display_order: i };
+      });
+      try { await api('/api/admin-asset', 'PATCH', { items }); }
+      catch (ex) { $('listMsg').textContent = 'Gagal simpan urutan: ' + ex.message; }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+
+    /* ---------- Boot ---------- */
+    if (token) enterDashboard(); else showLogin();
+  })();
+  </script>
+</body>
+</html>

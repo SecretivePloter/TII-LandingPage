@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Admin panel must never be indexed
+Disallow: /admin.html
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: /sitemap.xml

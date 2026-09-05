@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(pkill -f \"http.server 8991\")"
+    ]
+  }
+}

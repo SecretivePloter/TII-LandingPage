@@ -1,0 +1,12 @@
+{
+  "name": "trading-insights-indonesia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page + admin panel for Trading Insights Indonesia (Discord signal membership).",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

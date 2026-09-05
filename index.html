@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===== SEO ===== -->
+  <title>Trading Insights Indonesia — Sinyal Saham Harian & Membership Discord Terpercaya</title>
+  <meta name="description" content="Membership premium berbasis Discord dengan sinyal saham harian dari analyst berpengalaman. Rekomendasi saham Indonesia, swing, day trade, scalping, BSJP — plus komunitas aktif & edukasi. Bukti transparan, lihat sendiri." />
+  <meta name="keywords" content="sinyal saham harian, rekomendasi saham Indonesia, membership trading saham, grup sinyal saham terpercaya, komunitas trading saham, edukasi saham" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://DOMAIN-KAMU.vercel.app/" />
+
+  <!-- ===== Open Graph / social share ===== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Trading Insights Indonesia — Sinyal Saham Harian" />
+  <meta property="og:description" content="Berhenti trading dari feeling. Dapat sinyal harian, edukasi, dan komunitas Discord aktif. Bukti transparan di dalam." />
+  <meta property="og:site_name" content="Trading Insights Indonesia" />
+  <meta property="og:image" content="https://DOMAIN-KAMU.vercel.app/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Trading Insights Indonesia — Sinyal Saham Harian" />
+  <meta name="twitter:description" content="Berhenti trading dari feeling. Sinyal harian + komunitas Discord aktif." />
+
+  <!-- ===== Fonts: Sora (display), Instrument Sans (body), Spline Sans Mono (angka) ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet" />
+
+  <!-- ===== Tailwind (CDN) + tema kustom ===== -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:  { base: '#0A0E14', deep: '#0D1119', card: '#131A24', line: '#1E2836' },
+            gold:  { DEFAULT: '#C9A24B', light: '#D4AF6A', dim: '#8A7233' },
+            teal:  { DEFAULT: '#2E7D6B', dim: '#1F5A4E' },
+            ink:   '#E8E6E1',
+          },
+          fontFamily: {
+            display: ['var(--font-display)'],
+            body:    ['var(--font-body)'],
+            mono:    ['var(--font-mono)'],
+          },
+          // Numeric aliases so `font-500`, `font-700`, dst. valid — dipakai konsisten
+          // di seluruh halaman biar berat font gampang di-tweak.
+          fontWeight: {
+            400: '400', 500: '500', 600: '600', 700: '700', 800: '800',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- ===== Supabase client (dipakai untuk fetch galeri publik) ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <style>
+    :root {
+      --font-display: 'Sora', system-ui, sans-serif;
+      --font-body:    'Instrument Sans', system-ui, sans-serif;
+      --font-mono:    'Spline Sans Mono', ui-monospace, monospace;
+    }
+    body { font-family: var(--font-body); background-color: #0A0E14; color: #E8E6E1; }
+    h1, h2, h3, .font-display { font-family: var(--font-display); }
+    .font-mono { font-family: var(--font-mono); }
+
+    /* Glow lembut khas elemen gold — dipakai hemat biar terasa "premium", bukan norak. */
+    .glow-gold { box-shadow: 0 0 0 1px rgba(201,162,75,.25), 0 8px 40px -12px rgba(201,162,75,.35); }
+    .text-glow { text-shadow: 0 2px 30px rgba(201,162,75,.25); }
+
+    /* Garis aksen gold tipis di kiri heading section. */
+    .rule::before {
+      content: ''; display: inline-block; width: 2.5rem; height: 2px;
+      background: linear-gradient(90deg, #C9A24B, transparent);
+      margin-right: .9rem; vertical-align: middle;
+    }
+
+    .card { background-color: #131A24; border: 1px solid #1E2836; }
+
+    /* Hero overlay: jaga kontras headline di atas canvas partikel. */
+    .hero-veil {
+      background:
+        radial-gradient(1200px 500px at 30% 20%, rgba(10,14,20,.35), transparent 60%),
+        linear-gradient(180deg, rgba(10,14,20,.55) 0%, rgba(10,14,20,.35) 40%, rgba(10,14,20,.9) 100%);
+    }
+
+    /* Reveal on scroll */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* Accordion */
+    .faq-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+
+    /* Lightbox */
+    #lightbox { transition: opacity .25s ease; }
+
+    /* Scrollbar hint dalam gold */
+    ::selection { background: rgba(201,162,75,.3); }
+  </style>
+</head>
+
+<body class="antialiased selection:text-ink">
+
+  <!-- ============================ NAV ============================ -->
+  <header class="fixed top-0 inset-x-0 z-40 border-b border-navy-line/60 bg-navy-base/80 backdrop-blur-md">
+    <nav class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+      <a href="#hero" class="flex items-center gap-2.5 group">
+        <!-- Logo mark: elang emas + panah uptrend, disederhanakan jadi SVG inline -->
+        <span class="relative grid place-items-center w-9 h-9 rounded-lg card glow-gold">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-gold-light" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 17l5-5 3 3 4-6 4 4" />
+            <path d="M14 9h5v5" />
+          </svg>
+        </span>
+        <span class="font-display font-700 tracking-tight text-[15px] leading-none">
+          Trading Insights<span class="text-gold"> ID</span>
+        </span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-7 text-sm text-ink/70">
+        <a href="#masalah" class="hover:text-ink transition">Masalah</a>
+        <a href="#fitur" class="hover:text-ink transition">Fitur Harian</a>
+        <a href="#bukti" class="hover:text-ink transition">Bukti</a>
+        <a href="#harga" class="hover:text-ink transition">Harga</a>
+        <a href="#faq" class="hover:text-ink transition">FAQ</a>
+      </div>
+
+      <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+         class="hidden md:inline-flex items-center gap-2 rounded-lg bg-gold px-4 py-2 text-sm font-600 text-navy-base hover:bg-gold-light transition">
+        Join Discord
+      </a>
+
+      <!-- Mobile toggle -->
+      <button id="navToggle" aria-label="Buka menu" class="md:hidden grid place-items-center w-10 h-10 rounded-lg card">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden border-t border-navy-line/60 bg-navy-deep px-5 py-4 space-y-3 text-sm">
+      <a href="#masalah" class="block py-1.5 text-ink/80">Masalah</a>
+      <a href="#fitur" class="block py-1.5 text-ink/80">Fitur Harian</a>
+      <a href="#bukti" class="block py-1.5 text-ink/80">Bukti</a>
+      <a href="#harga" class="block py-1.5 text-ink/80">Harga</a>
+      <a href="#faq" class="block py-1.5 text-ink/80">FAQ</a>
+      <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+         class="block text-center rounded-lg bg-gold px-4 py-2.5 font-600 text-navy-base mt-2">Join Discord Sekarang</a>
+    </div>
+  </header>
+
+  <!-- ============================ HERO ============================ -->
+  <section id="hero" class="relative min-h-[100svh] flex items-center overflow-hidden pt-16">
+    <!-- Canvas "Market Pulse" — full-bleed di belakang hero SAJA -->
+    <canvas id="marketPulse" class="absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
+    <div class="absolute inset-0 hero-veil pointer-events-none"></div>
+
+    <div class="relative max-w-6xl mx-auto px-5 w-full grid lg:grid-cols-12 gap-10 items-center">
+      <div class="lg:col-span-8">
+        <span class="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-navy-card/60 px-3.5 py-1.5 text-xs text-gold-light backdrop-blur-sm">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal animate-pulse"></span>
+          Komunitas Discord aktif tiap hari bursa
+        </span>
+
+        <h1 class="mt-6 font-display font-800 tracking-tight text-4xl sm:text-5xl lg:text-[3.9rem] leading-[1.05] text-glow">
+          Mayoritas trader ritel bukan kalah karena<br class="hidden sm:block" />
+          <span class="text-gold-light">kurang modal.</span> Mereka kalah karena
+          <span class="text-gold-light">tebak-tebakan.</span>
+        </h1>
+
+        <p class="mt-6 max-w-2xl text-lg text-ink/75 leading-relaxed">
+          Keputusan yang diambil dari panik, FOMO, dan grup WA penuh noise cuma bikin porto
+          bocor pelan-pelan. Kami kasih <span class="text-ink font-500">sinyal harian dari analyst
+          berpengalaman</span> plus komunitas Discord yang benar-benar hidup — jadi kamu masuk
+          dan keluar posisi dengan rencana, bukan perasaan.
+        </p>
+
+        <div class="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+             class="group inline-flex items-center gap-2.5 rounded-xl bg-gold px-7 py-4 font-display font-700 text-navy-base hover:bg-gold-light transition glow-gold">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0016 3l-.2.4a13 13 0 013.9 2A18.5 18.5 0 004 5.4a13 13 0 013.9-2L7.7 3A19.8 19.8 0 003.7 4.4C1.5 8 1 11.5 1.2 15a19.9 19.9 0 006 3l.4-.5c-.7-.3-1.4-.6-2-1l.2-.2a14.2 14.2 0 0012.4 0l.2.2c-.6.4-1.3.7-2 1l.4.5a19.9 19.9 0 006-3c.3-4.1-.5-7.6-2.5-10.6zM8.5 13c-.8 0-1.4-.7-1.4-1.6 0-.9.6-1.6 1.4-1.6.8 0 1.4.7 1.4 1.6 0 .9-.6 1.6-1.4 1.6zm7 0c-.8 0-1.4-.7-1.4-1.6 0-.9.6-1.6 1.4-1.6.8 0 1.4.7 1.4 1.6 0 .9-.6 1.6-1.4 1.6z"/></svg>
+            Join Discord Sekarang
+          </a>
+          <a href="#bukti" class="inline-flex items-center gap-2 text-sm text-ink/70 hover:text-ink transition">
+            Lihat bukti dulu
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+        </div>
+
+        <!-- Trust bar: angka count-up (bukan winrate) -->
+        <div class="mt-12 grid grid-cols-3 max-w-lg gap-6 border-t border-navy-line/70 pt-6">
+          <div>
+            <div class="font-mono font-600 text-2xl text-gold-light" data-countup="1200" data-suffix="+">0</div>
+            <div class="mt-1 text-xs text-ink/55">Member komunitas</div>
+          </div>
+          <div>
+            <div class="font-mono font-600 text-2xl text-gold-light" data-countup="5" data-suffix=" menu">0</div>
+            <div class="mt-1 text-xs text-ink/55">Sinyal harian</div>
+          </div>
+          <div>
+            <div class="font-mono font-600 text-2xl text-gold-light" data-countup="7" data-suffix="/hari bursa">0</div>
+            <div class="mt-1 text-xs text-ink/55">Update rutin</div>
+          </div>
+        </div>
+
+        <!-- Disclaimer wajib — kecil tapi kebaca -->
+        <p class="mt-6 text-xs text-ink/40 max-w-xl">
+          Bukan ajakan investasi. Data historis bukan jaminan hasil ke depan.
+        </p>
+      </div>
+    </div>
+
+    <a href="#masalah" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-ink/40 hover:text-ink/70 transition" aria-label="Scroll ke bawah">
+      <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </a>
+  </section>
+
+  <!-- ============================ MASALAH / AGITASI ============================ -->
+  <section id="masalah" class="relative py-24 border-t border-navy-line/40">
+    <div class="max-w-6xl mx-auto px-5">
+      <p class="rule text-sm font-500 text-gold-light reveal">Kenapa porto kamu bocor</p>
+      <div class="mt-5 grid lg:grid-cols-2 gap-12 items-start">
+        <h2 class="font-display font-700 text-3xl sm:text-4xl leading-tight reveal">
+          Info saham di internet bukan sedikit — masalahnya kebanyakan, dan semuanya teriak paling kencang.
+        </h2>
+        <p class="text-ink/70 text-lg leading-relaxed reveal">
+          Setiap pagi timeline penuh "pom-pom", grup sebelah bilang beli, grup lain bilang jual, dan
+          kamu akhirnya cut loss di titik terburuk karena panik ikut arus. Bukan salah kamu — kamu
+          cuma nggak punya <span class="text-ink font-500">sistem</span> dan tempat bertanya yang jujur.
+        </p>
+      </div>
+
+      <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Pain 1 -->
+        <div class="card rounded-2xl p-6 reveal">
+          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg>
+          </div>
+          <h3 class="font-display font-600 text-base">Keputusan emosional</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Beli pas euforia, jual pas takut. Pola klasik yang menggerus modal tanpa kamu sadari.</p>
+        </div>
+        <!-- Pain 2 -->
+        <div class="card rounded-2xl p-6 reveal">
+          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M11 4a7 7 0 100 14 7 7 0 000-14z"/><path d="M21 21l-4.3-4.3"/></svg>
+          </div>
+          <h3 class="font-display font-600 text-base">Overload informasi</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Ratusan sumber, nol filter. Sinyal penting tenggelam di lautan noise dan clickbait.</p>
+        </div>
+        <!-- Pain 3 -->
+        <div class="card rounded-2xl p-6 reveal">
+          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 2l9 4.5v5c0 5-3.8 9-9 10.5C6.8 20.5 3 16.5 3 11.5v-5L12 2z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h3 class="font-display font-600 text-base">Nggak punya sistem</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Tanpa area entry, TP, dan SL yang jelas, tiap posisi jadi taruhan — bukan trading.</p>
+        </div>
+        <!-- Pain 4 -->
+        <div class="card rounded-2xl p-6 reveal">
+          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.9"/></svg>
+          </div>
+          <h3 class="font-display font-600 text-base">Sendirian saat ragu</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Momen krusial datang, dan nggak ada yang bisa diajak diskusi cepat sebelum eksekusi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FITUR HARIAN ============================ -->
+  <section id="fitur" class="relative py-24 bg-navy-deep border-y border-navy-line/40">
+    <div class="max-w-6xl mx-auto px-5">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+        <div>
+          <p class="rule text-sm font-500 text-gold-light reveal">Yang kamu dapat tiap hari</p>
+          <h2 class="mt-5 font-display font-700 text-3xl sm:text-4xl leading-tight reveal">
+            Lima menu sinyal, satu tujuan: <span class="text-gold-light">eksekusi dengan rencana.</span>
+          </h2>
+        </div>
+        <p class="text-ink/60 max-w-sm reveal">
+          Setiap gaya trading punya menunya sendiri. Kamu tinggal pilih yang cocok sama jam dan
+          gaya main kamu — semua diramu analyst, bukan bot pom-pom.
+        </p>
+      </div>
+
+      <div class="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Swing -->
+        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 15l4-6 4 3 4-8 6 5"/><path d="M3 20h18"/></svg>
+            </div>
+            <span class="font-mono text-xs text-ink/40">01</span>
+          </div>
+          <h3 class="mt-5 font-display font-600 text-lg">Swing Trading</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Posisi beberapa hari sampai minggu. Cocok buat kamu yang nggak bisa pantau layar seharian.</p>
+        </article>
+
+        <!-- Valid Buy — TANPA klaim winrate -->
+        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal ring-1 ring-gold/20">
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <span class="font-mono text-xs text-ink/40">02</span>
+          </div>
+          <h3 class="mt-5 font-display font-600 text-lg">Valid Buy</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">
+            Momen entry yang sudah lolos filter teknikal analyst. Track record kami transparan —
+            <a href="#bukti" class="text-gold-light underline underline-offset-2 hover:text-gold">lihat sendiri buktinya di bawah 👇</a>
+          </p>
+        </article>
+
+        <!-- Day Trade -->
+        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <span class="font-mono text-xs text-ink/40">03</span>
+          </div>
+          <h3 class="mt-5 font-display font-600 text-lg">Day Trade</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Buka-tutup posisi di hari yang sama. Sinyal masuk pas jam bursa, langsung actionable.</p>
+        </article>
+
+        <!-- Live Trade / Scalping -->
+        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>
+            </div>
+            <span class="font-mono text-xs text-ink/40">04</span>
+          </div>
+          <h3 class="mt-5 font-display font-600 text-lg">Live Trade / Scalping</h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Arahan cepat lewat voice channel saat market bergerak. Buat yang main tipis-tipis rapat.</p>
+        </article>
+
+        <!-- BSJP -->
+        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0"/><path d="M12 2v7M12 9l3-3M12 9L9 6"/><path d="M3 18h18"/></svg>
+            </div>
+            <span class="font-mono text-xs text-ink/40">05</span>
+          </div>
+          <h3 class="mt-5 font-display font-600 text-lg">BSJP <span class="text-ink/45 font-body font-400 text-sm">— Beli Sore Jual Pagi</span></h3>
+          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Strategi overnight yang manfaatin gap pagi. Setup sore, panen pas market buka.</p>
+        </article>
+
+        <!-- CTA card -->
+        <article class="rounded-2xl p-7 flex flex-col justify-between bg-gradient-to-br from-navy-card to-navy-base border border-gold/25 glow-gold reveal">
+          <div>
+            <h3 class="font-display font-700 text-lg text-gold-light">Semua menu dalam satu Discord.</h3>
+            <p class="mt-2 text-sm text-ink/70 leading-relaxed">Nggak perlu loncat-loncat grup. Satu tempat, semua sinyal, plus tim yang bisa ditanya.</p>
+          </div>
+          <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+             class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-5 py-3 text-sm font-600 text-navy-base hover:bg-gold-light transition">
+            Masuk sekarang
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ BUKTI SOSIAL ============================ -->
+  <section id="bukti" class="relative py-24">
+    <div class="max-w-6xl mx-auto px-5">
+      <p class="rule text-sm font-500 text-gold-light reveal">Bukti, bukan janji</p>
+      <div class="mt-5 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+        <h2 class="font-display font-700 text-3xl sm:text-4xl leading-tight reveal max-w-2xl">
+          Kami nggak minta kamu percaya kata-kata. <span class="text-gold-light">Biar screenshot yang bicara.</span>
+        </h2>
+        <p class="text-ink/60 max-w-sm reveal">Semua gambar di bawah asli dari member dan hasil TP yang kami input sendiri. Klik untuk perbesar.</p>
+      </div>
+
+      <!-- Hasil TP -->
+      <h3 class="mt-14 mb-5 font-display font-600 text-xl text-ink/90 reveal">Hasil Take Profit</h3>
+      <div id="gallery-hasil-tp" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-category="hasil-tp"></div>
+
+      <!-- Winrate / track record -->
+      <h3 class="mt-14 mb-5 font-display font-600 text-xl text-ink/90 reveal">Track Record & Winrate</h3>
+      <div id="gallery-winrate" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-category="winrate"></div>
+
+      <!-- Testimoni -->
+      <h3 class="mt-14 mb-5 font-display font-600 text-xl text-ink/90 reveal">Kata Member</h3>
+      <div id="gallery-testimoni" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-category="testimoni"></div>
+
+      <div class="mt-12 text-center reveal">
+        <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+           class="inline-flex items-center gap-2.5 rounded-xl border border-gold/40 px-6 py-3.5 font-600 text-gold-light hover:bg-gold hover:text-navy-base transition">
+          Gabung dan jadi bukti berikutnya
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ KREDIBILITAS ============================ -->
+  <section id="analyst" class="relative py-24 bg-navy-deep border-y border-navy-line/40">
+    <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-12 gap-12 items-start">
+      <div class="lg:col-span-5">
+        <p class="rule text-sm font-500 text-gold-light reveal">Bukan sekadar grup sinyal</p>
+        <h2 class="mt-5 font-display font-700 text-3xl sm:text-4xl leading-tight reveal">
+          Di balik setiap sinyal, ada analyst yang benar-benar duduk baca chart.
+        </h2>
+        <p class="mt-6 text-ink/70 leading-relaxed reveal">
+          Member nggak cuma dapat titik entry. Kamu dapat <span class="text-ink font-500">materi edukasi
+          saham</span> supaya paham alasannya, dan <span class="text-ink font-500">konsultasi portofolio
+          privat</span> supaya keputusan kamu nyambung sama kondisi porto sendiri — bukan asal ikut.
+        </p>
+
+        <ul class="mt-8 space-y-4 reveal">
+          <li class="flex gap-3">
+            <span class="mt-0.5 text-gold-light"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <span class="text-ink/75"><span class="text-ink font-500">Edukasi terstruktur</span> — dari basic sampai baca pola lanjutan, bukan tips serabutan.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="mt-0.5 text-gold-light"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <span class="text-ink/75"><span class="text-ink font-500">Konsultasi porto privat</span> — bahas kondisi porto kamu, bukan template yang sama buat semua orang.</span>
+          </li>
+          <li class="flex gap-3">
+            <span class="mt-0.5 text-gold-light"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span>
+            <span class="text-ink/75"><span class="text-ink font-500">Diskusi dua arah</span> — tanya sebelum eksekusi, bukan nunggu sinyal turun dari langit.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="lg:col-span-7">
+        <!-- Foto analyst dari Supabase; kosong -> placeholder rapi -->
+        <div id="gallery-analyst" class="grid grid-cols-2 sm:grid-cols-3 gap-4" data-category="analyst"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ HARGA ============================ -->
+  <section id="harga" class="relative py-24">
+    <div class="max-w-6xl mx-auto px-5">
+      <div class="text-center max-w-2xl mx-auto">
+        <p class="text-sm font-500 text-gold-light reveal">Pilih level keseriusan kamu</p>
+        <h2 class="mt-4 font-display font-700 text-3xl sm:text-4xl leading-tight reveal">
+          Dua paket. Satu pintu masuk yang sama: <span class="text-gold-light">Discord.</span>
+        </h2>
+        <p class="mt-4 text-ink/60 reveal">Belum ada sistem bayar terpisah — join Discord dulu sebagai langkah pertama, detail paket dibahas di dalam.</p>
+      </div>
+
+      <div class="mt-14 grid lg:grid-cols-2 gap-6 items-stretch max-w-4xl mx-auto">
+        <!-- PREMIUM (value pick) -->
+        <div class="card rounded-3xl p-8 flex flex-col reveal">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-700 text-2xl">Premium</h3>
+            <span class="rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs text-teal font-500">Value pick</span>
+          </div>
+          <p class="mt-2 text-sm text-ink/55">Buat kamu yang mau sinyal harian lengkap tanpa layanan privat.</p>
+
+          <div class="mt-6 flex items-end gap-3">
+            <span class="font-mono text-ink/35 line-through text-lg">Rp500.000</span>
+            <span class="font-mono font-600 text-4xl text-gold-light">Rp230.000</span>
+            <span class="text-ink/50 text-sm mb-1">/bulan</span>
+          </div>
+
+          <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+             class="mt-7 inline-flex items-center justify-center rounded-xl border border-gold/50 px-6 py-3.5 font-600 text-gold-light hover:bg-gold hover:text-navy-base transition">
+            Mulai dari Premium
+          </a>
+
+          <ul class="mt-8 space-y-2.5 text-sm">
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Diskusi Umum</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Kalkulator Keuntungan Saham</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Basic Buku Materi Saham</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Media Sharing Pembelajaran Saham</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Berita Up to Date by Bot</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Giveaway Random Bulanan</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Random Stockpick</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Voice Arahan Trading</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Bot Media Saham Autopost</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Stockpick: Swing / BSJP / Day Trade / Live Scalping</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Rekomendasi Trading Harian</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Insight Index / IHSG Harian</span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Analisis IPO Hunter <span class="ml-1 rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-600 text-gold-light align-middle">NEW</span></span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Analisa FCA <span class="ml-1 rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-600 text-gold-light align-middle">NEW</span></span></li>
+            <li class="flex gap-2.5"><span class="text-teal mt-0.5">✓</span><span class="text-ink/75">Analisa Right Issue <span class="ml-1 rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-600 text-gold-light align-middle">NEW</span></span></li>
+          </ul>
+
+          <div class="mt-6 pt-5 border-t border-navy-line/70">
+            <p class="text-xs text-ink/40 mb-3">Belum termasuk — <span class="text-ink/60">upgrade ke Platinum buat ini:</span></p>
+            <ul class="space-y-2 text-sm">
+              <li class="flex gap-2.5"><span class="text-ink/30 mt-0.5">✕</span><span class="text-ink/45">Bedah Emiten</span></li>
+              <li class="flex gap-2.5"><span class="text-ink/30 mt-0.5">✕</span><span class="text-ink/45">Konsultasi Porto</span></li>
+              <li class="flex gap-2.5"><span class="text-ink/30 mt-0.5">✕</span><span class="text-ink/45">Bot Alarm Trigger Price</span></li>
+              <li class="flex gap-2.5"><span class="text-ink/30 mt-0.5">✕</span><span class="text-ink/45">Request Analisis Teknikal / Fundamental</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- PLATINUM (recommended, kanan) -->
+        <div class="relative rounded-3xl p-8 flex flex-col bg-gradient-to-b from-navy-card to-navy-base border border-gold/40 glow-gold reveal">
+          <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold px-4 py-1.5 text-xs font-700 text-navy-base whitespace-nowrap">
+            ★ Paling Direkomendasikan
+          </span>
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-700 text-2xl text-gold-light">Platinum</h3>
+            <span class="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs text-gold-light font-500">Full-service</span>
+          </div>
+          <p class="mt-2 text-sm text-ink/60">Buat yang serius jadikan trading sumber cuan utama, bukan sampingan.</p>
+
+          <div class="mt-6 flex items-end gap-3">
+            <span class="font-mono font-600 text-4xl text-gold-light">Rp850.000</span>
+            <span class="text-ink/50 text-sm mb-1">/bulan</span>
+          </div>
+
+          <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+             class="mt-7 inline-flex items-center justify-center rounded-xl bg-gold px-6 py-3.5 font-700 text-navy-base hover:bg-gold-light transition">
+            Ambil Platinum
+          </a>
+
+          <div class="mt-8">
+            <p class="text-sm text-gold-light font-500 mb-3">Semua fitur Premium, plus:</p>
+            <ul class="space-y-2.5 text-sm">
+              <li class="flex gap-2.5"><span class="text-gold-light mt-0.5">✓</span><span class="text-ink/85 font-500">Bedah Emiten</span></li>
+              <li class="flex gap-2.5"><span class="text-gold-light mt-0.5">✓</span><span class="text-ink/85 font-500">Konsultasi Porto Privat</span></li>
+              <li class="flex gap-2.5"><span class="text-gold-light mt-0.5">✓</span><span class="text-ink/85 font-500">Bot Alarm Trigger Price</span></li>
+              <li class="flex gap-2.5"><span class="text-gold-light mt-0.5">✓</span><span class="text-ink/85 font-500">Request Analisis Teknikal / Fundamental</span></li>
+            </ul>
+          </div>
+
+          <div class="mt-6 pt-5 border-t border-gold/15">
+            <p class="text-xs text-ink/50 leading-relaxed">
+              Analyst membedah emiten sesuai request kamu, bantu tata porto, dan alarm harga otomatis
+              biar kamu nggak ketinggalan momen — semua yang bikin Premium terasa "kurang satu langkah".
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="mt-8 text-center text-xs text-ink/40 max-w-xl mx-auto reveal">
+        Harga bisa berubah sewaktu-waktu. Detail metode pembayaran dan aktivasi role dijelaskan setelah kamu masuk Discord.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================ FAQ ============================ -->
+  <section id="faq" class="relative py-24 bg-navy-deep border-y border-navy-line/40">
+    <div class="max-w-3xl mx-auto px-5">
+      <p class="rule text-sm font-500 text-gold-light reveal text-center">Sebelum kamu ragu</p>
+      <h2 class="mt-5 font-display font-700 text-3xl sm:text-4xl leading-tight text-center reveal">Pertanyaan yang jujur, jawaban yang jujur.</h2>
+
+      <div class="mt-12 space-y-3">
+        <!-- Item -->
+        <div class="card rounded-xl overflow-hidden reveal">
+          <button class="faq-trigger w-full flex items-center justify-between gap-4 p-5 text-left">
+            <span class="font-display font-600 text-base">Ini bukan judi kan?</span>
+            <svg class="faq-icon w-5 h-5 text-gold-light shrink-0 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-body"><p class="px-5 pb-5 text-sm text-ink/65 leading-relaxed">Bukan. Judi itu murni keberuntungan tanpa dasar. Yang kami kerjakan adalah analisa teknikal dan fundamental atas emiten nyata di bursa — ada alasan, ada area entry, ada exit plan. Risiko tetap ada (itu sifat pasar), tapi keputusannya berbasis data, bukan lempar koin.</p></div>
+        </div>
+
+        <div class="card rounded-xl overflow-hidden reveal">
+          <button class="faq-trigger w-full flex items-center justify-between gap-4 p-5 text-left">
+            <span class="font-display font-600 text-base">Kalau signal-nya loss gimana?</span>
+            <svg class="faq-icon w-5 h-5 text-gold-light shrink-0 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-body"><p class="px-5 pb-5 text-sm text-ink/65 leading-relaxed">Loss itu bagian normal dari trading — siapa pun yang bilang 100% profit sedang bohong. Yang kami jaga adalah manajemen risiko: setiap sinyal datang dengan area stop loss supaya kerugian terkontrol dan profit lebih besar dari loss dalam jangka panjang. Kamu tetap pegang kendali penuh atas ukuran posisi kamu sendiri.</p></div>
+        </div>
+
+        <div class="card rounded-xl overflow-hidden reveal">
+          <button class="faq-trigger w-full flex items-center justify-between gap-4 p-5 text-left">
+            <span class="font-display font-600 text-base">Bisa cancel kapan aja?</span>
+            <svg class="faq-icon w-5 h-5 text-gold-light shrink-0 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-body"><p class="px-5 pb-5 text-sm text-ink/65 leading-relaxed">Bisa. Membership bersifat bulanan — kalau kamu merasa nggak cocok, cukup nggak perpanjang di bulan berikutnya. Nggak ada kontrak jangka panjang yang ngunci kamu.</p></div>
+        </div>
+
+        <div class="card rounded-xl overflow-hidden reveal">
+          <button class="faq-trigger w-full flex items-center justify-between gap-4 p-5 text-left">
+            <span class="font-display font-600 text-base">Gimana cara masuk Discord setelah bayar?</span>
+            <svg class="faq-icon w-5 h-5 text-gold-light shrink-0 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-body"><p class="px-5 pb-5 text-sm text-ink/65 leading-relaxed">Klik tombol "Join Discord" mana pun di halaman ini untuk masuk server dulu — gratis. Di dalam, admin akan arahkan langkah aktivasi role Premium/Platinum sesuai paket yang kamu pilih, termasuk metode pembayaran yang berlaku saat itu.</p></div>
+        </div>
+
+        <div class="card rounded-xl overflow-hidden reveal">
+          <button class="faq-trigger w-full flex items-center justify-between gap-4 p-5 text-left">
+            <span class="font-display font-600 text-base">Cocok buat pemula yang belum ngerti apa-apa?</span>
+            <svg class="faq-icon w-5 h-5 text-gold-light shrink-0 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="faq-body"><p class="px-5 pb-5 text-sm text-ink/65 leading-relaxed">Sangat cocok. Selain sinyal, ada materi edukasi dari basic dan channel diskusi tempat kamu bebas nanya tanpa dihakimi. Justru pemula yang paling diuntungkan karena belajar sistem sejak awal, bukan trial-and-error pakai uang sendiri.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CTA AKHIR ============================ -->
+  <section class="relative py-28 overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none opacity-60" style="background: radial-gradient(600px 300px at 50% 0%, rgba(201,162,75,.12), transparent 70%);"></div>
+    <div class="relative max-w-3xl mx-auto px-5 text-center">
+      <h2 class="font-display font-800 text-3xl sm:text-5xl leading-tight reveal">
+        Besok pagi bursa buka lagi.<br />
+        <span class="text-gold-light">Kamu mau tebak-tebakan lagi, atau punya rencana?</span>
+      </h2>
+      <p class="mt-6 text-ink/70 text-lg reveal">Gabung komunitas, lihat sinyalnya, rasakan bedanya trading dengan sistem.</p>
+      <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+         class="mt-9 inline-flex items-center gap-2.5 rounded-xl bg-gold px-8 py-4 font-display font-700 text-navy-base hover:bg-gold-light transition glow-gold reveal">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0016 3l-.2.4a13 13 0 013.9 2A18.5 18.5 0 004 5.4a13 13 0 013.9-2L7.7 3A19.8 19.8 0 003.7 4.4C1.5 8 1 11.5 1.2 15a19.9 19.9 0 006 3l.4-.5c-.7-.3-1.4-.6-2-1l.2-.2a14.2 14.2 0 0012.4 0l.2.2c-.6.4-1.3.7-2 1l.4.5a19.9 19.9 0 006-3c.3-4.1-.5-7.6-2.5-10.6zM8.5 13c-.8 0-1.4-.7-1.4-1.6 0-.9.6-1.6 1.4-1.6.8 0 1.4.7 1.4 1.6 0 .9-.6 1.6-1.4 1.6zm7 0c-.8 0-1.4-.7-1.4-1.6 0-.9.6-1.6 1.4-1.6.8 0 1.4.7 1.4 1.6 0 .9-.6 1.6-1.4 1.6z"/></svg>
+        Join Discord Sekarang
+      </a>
+      <p class="mt-5 text-xs text-ink/40 reveal">Bukan ajakan investasi. Data historis bukan jaminan hasil ke depan.</p>
+    </div>
+  </section>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="border-t border-navy-line/60 bg-navy-deep">
+    <div class="max-w-6xl mx-auto px-5 py-14 grid md:grid-cols-3 gap-10">
+      <div>
+        <div class="flex items-center gap-2.5">
+          <span class="grid place-items-center w-8 h-8 rounded-lg card">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-gold-light" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 3 3 4-6 4 4"/><path d="M14 9h5v5"/></svg>
+          </span>
+          <span class="font-display font-700 text-sm">Trading Insights <span class="text-gold">ID</span></span>
+        </div>
+        <p class="mt-4 text-sm text-ink/50 leading-relaxed max-w-xs">Komunitas & sinyal saham harian berbasis Discord. Trading dengan sistem, bukan feeling.</p>
+      </div>
+      <div>
+        <p class="font-600 text-sm text-ink/80">Navigasi</p>
+        <ul class="mt-4 space-y-2 text-sm text-ink/55">
+          <li><a href="#fitur" class="hover:text-ink transition">Fitur Harian</a></li>
+          <li><a href="#bukti" class="hover:text-ink transition">Bukti Sosial</a></li>
+          <li><a href="#harga" class="hover:text-ink transition">Harga</a></li>
+          <li><a href="#faq" class="hover:text-ink transition">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="font-600 text-sm text-ink/80">Kontak</p>
+        <ul class="mt-4 space-y-2 text-sm text-ink/55">
+          <li><a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener" class="hover:text-ink transition">Discord Server</a></li>
+          <li><span class="text-ink/40">Email: <!-- TODO: isi email kontak --></span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-navy-line/60">
+      <div class="max-w-6xl mx-auto px-5 py-6 space-y-3">
+        <p class="text-xs text-ink/40 leading-relaxed">
+          <span class="text-ink/60 font-500">Disclaimer risiko:</span> Trading saham mengandung risiko kehilangan modal.
+          Seluruh konten di halaman ini dan di dalam komunitas bersifat edukasi dan berbagi analisa, <span class="text-ink/60">bukan
+          rekomendasi resmi</span> dari OJK atau lembaga keuangan mana pun. Trading Insights Indonesia bukan perusahaan sekuritas,
+          manajer investasi, atau penasihat keuangan berizin. Keputusan trading sepenuhnya tanggung jawab masing-masing member.
+          Data historis dan hasil masa lalu bukan jaminan hasil di masa depan.
+        </p>
+        <p class="text-xs text-ink/35">© <span id="year"></span> Trading Insights Indonesia. Semua hak dilindungi.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============================ LIGHTBOX ============================ -->
+  <div id="lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-navy-base/95 backdrop-blur-sm p-4 opacity-0">
+    <button id="lightboxClose" class="absolute top-5 right-5 grid place-items-center w-11 h-11 rounded-full card text-ink/80 hover:text-ink" aria-label="Tutup">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <figure class="max-w-4xl w-full text-center">
+      <img id="lightboxImg" src="" alt="" class="max-h-[80vh] w-auto mx-auto rounded-xl border border-navy-line" />
+      <figcaption id="lightboxCap" class="mt-4 text-sm text-ink/60"></figcaption>
+    </figure>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- SCRIPTS                                                        -->
+  <!-- ============================================================= -->
+  <script>
+  (function () {
+    'use strict';
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* ---------- Mobile nav ---------- */
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    navToggle.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+    /* ---------- Reveal on scroll ---------- */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ---------- Count-up angka (bukan winrate) ---------- */
+    const countObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        const target = parseInt(el.dataset.countup, 10);
+        const suffix = el.dataset.suffix || '';
+        if (prefersReduced) { el.textContent = target.toLocaleString('id-ID') + suffix; countObserver.unobserve(el); return; }
+        const dur = 1400; const start = performance.now();
+        const tick = (now) => {
+          const p = Math.min((now - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * eased).toLocaleString('id-ID') + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        countObserver.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('[data-countup]').forEach(el => countObserver.observe(el));
+
+    /* ---------- FAQ accordion ---------- */
+    document.querySelectorAll('.faq-trigger').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const body = btn.nextElementSibling;
+        const icon = btn.querySelector('.faq-icon');
+        const open = body.style.maxHeight && body.style.maxHeight !== '0px';
+        if (open) { body.style.maxHeight = '0px'; icon.style.transform = ''; }
+        else { body.style.maxHeight = body.scrollHeight + 'px'; icon.style.transform = 'rotate(180deg)'; }
+      });
+    });
+
+    /* ---------- Lightbox ---------- */
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCap = document.getElementById('lightboxCap');
+    function openLightbox(src, caption) {
+      lightboxImg.src = src; lightboxImg.alt = caption || '';
+      lightboxCap.textContent = caption || '';
+      lightbox.classList.remove('hidden'); lightbox.classList.add('flex');
+      requestAnimationFrame(() => { lightbox.style.opacity = '1'; });
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      lightbox.style.opacity = '0';
+      setTimeout(() => { lightbox.classList.add('hidden'); lightbox.classList.remove('flex'); lightboxImg.src = ''; }, 250);
+      document.body.style.overflow = '';
+    }
+    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) closeLightbox(); });
+
+    /* =====================================================================
+       SUPABASE — fetch galeri publik (RLS: anon cuma boleh select)
+       ===================================================================== */
+    const EMPTY_LABELS = {
+      'testimoni': 'Testimoni member segera ditambahkan.',
+      'hasil-tp': 'Screenshot hasil TP segera ditambahkan.',
+      'winrate': 'Rekap track record segera ditambahkan.',
+      'analyst': 'Profil analyst segera ditambahkan.',
+    };
+
+    function skeletonHTML() {
+      return Array.from({ length: 4 }).map(() =>
+        '<div class="aspect-[4/5] rounded-xl card animate-pulse"></div>').join('');
+    }
+
+    function emptyHTML(category) {
+      const label = EMPTY_LABELS[category] || 'Segera ditambahkan.';
+      return '<div class="col-span-full rounded-xl border border-dashed border-navy-line/80 bg-navy-card/40 py-12 text-center">' +
+             '<p class="text-sm text-ink/45">' + label + '</p></div>';
+    }
+
+    // Placeholder avatar rapi untuk analyst kosong (bukan broken image).
+    function analystPlaceholderHTML() {
+      const card = () =>
+        '<div class="aspect-square rounded-2xl card grid place-items-center">' +
+          '<svg class="w-14 h-14 text-navy-line" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>' +
+        '</div>';
+      return '<div class="col-span-full grid grid-cols-2 sm:grid-cols-3 gap-4">' + card() + card() + card() +
+             '</div><p class="col-span-full mt-3 text-xs text-ink/40">Profil analyst akan tampil di sini.</p>';
+    }
+
+    function assetCardHTML(a) {
+      const cap = (a.caption || '').replace(/"/g, '&quot;');
+      const alt = a.caption || a.category;
+      return '' +
+        '<button class="group relative block overflow-hidden rounded-xl card hover:border-gold/40 transition text-left" ' +
+                'data-src="' + a.file_url + '" data-cap="' + cap + '">' +
+          '<img src="' + a.file_url + '" alt="' + alt.replace(/"/g, '&quot;') + '" loading="lazy" ' +
+               'class="w-full h-full object-cover aspect-[4/5] group-hover:scale-[1.03] transition duration-500" />' +
+          (a.caption ? '<span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-base/90 to-transparent p-3 text-xs text-ink/80">' + a.caption + '</span>' : '') +
+          '<span class="absolute top-2 right-2 grid place-items-center w-7 h-7 rounded-lg bg-navy-base/70 text-gold-light opacity-0 group-hover:opacity-100 transition">' +
+            '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>' +
+          '</span>' +
+        '</button>';
+    }
+
+    function wireGallery(container) {
+      container.querySelectorAll('[data-src]').forEach(btn => {
+        btn.addEventListener('click', () => openLightbox(btn.dataset.src, btn.dataset.cap));
+      });
+    }
+
+    async function loadGalleries() {
+      const containers = document.querySelectorAll('[data-category]');
+      containers.forEach(c => { c.innerHTML = skeletonHTML(); });
+
+      let cfg;
+      try {
+        const res = await fetch('/api/config');
+        if (!res.ok) throw new Error('config');
+        cfg = await res.json();
+      } catch (err) {
+        // Tanpa config, galeri nggak bisa jalan — tampilkan empty state, jangan broken.
+        containers.forEach(c => {
+          c.innerHTML = c.dataset.category === 'analyst' ? analystPlaceholderHTML() : emptyHTML(c.dataset.category);
+        });
+        return;
+      }
+
+      const supabase = window.supabase.createClient(cfg.url, cfg.anonKey);
+
+      await Promise.all(Array.from(containers).map(async (container) => {
+        const category = container.dataset.category;
+        const { data, error } = await supabase
+          .from('assets').select('*').eq('category', category)
+          .order('display_order', { ascending: true });
+
+        if (error) { console.error('[galeri]', category, error.message); }
+
+        if (!data || !data.length) {
+          container.innerHTML = category === 'analyst' ? analystPlaceholderHTML() : emptyHTML(category);
+          return;
+        }
+        container.innerHTML = data.map(assetCardHTML).join('');
+        wireGallery(container);
+      }));
+    }
+
+    loadGalleries();
+
+    /* =====================================================================
+       MARKET PULSE — interactive particle network (native canvas)
+       Metafora: node = ticker harga, garis = korelasi antar saham.
+       ===================================================================== */
+    (function marketPulse() {
+      const canvas = document.getElementById('marketPulse');
+      const hero = document.getElementById('hero');
+      if (!canvas || !hero) return;
+      const ctx = canvas.getContext('2d', { alpha: true });
+
+      const GOLD = '212, 175, 106';   // #D4AF6A
+      const TEAL = '46, 125, 107';    // #2E7D6B — sentimen "netral", minoritas
+      let W = 0, H = 0, DPR = 1;
+      let nodes = [];
+      let linkDist = 130;             // radius koneksi antar node
+      let raf = null;
+      let running = false;
+
+      // Kepadatan SENGAJA tinggi — target kesan "grid data pasar" yang ramai.
+      // Jumlah absolut turun proporsional di layar kecil biar perf tetap wajar.
+      function computeCount() {
+        const area = W * H;
+        const perPixel = W < 640 ? 9000 : (W < 1024 ? 7000 : 5200); // makin kecil pembagi = makin padat
+        return Math.min(Math.round(area / perPixel), W < 640 ? 90 : 220);
+      }
+
+      function makeNode() {
+        const isTeal = Math.random() < 0.20; // ~20% teal, sisanya gold
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: 2 + Math.random() * 2,                       // 2–4px
+          vx: (Math.random() - 0.5) * 0.20,               // drift horizontal lambat
+          vy: (Math.random() - 0.5) * 0.35,               // drift vertikal lebih terasa (candle naik-turun)
+          color: isTeal ? TEAL : GOLD,
+          pulse: 0,          // efek "volume spike" dari cursor / signal flash (0..1)
+          flashLinks: null,  // target garis saat "signal flash"
+          flashLife: 0,
+        };
+      }
+
+      function build() {
+        const rect = hero.getBoundingClientRect();
+        W = rect.width; H = rect.height;
+        DPR = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(W * DPR);
+        canvas.height = Math.round(H * DPR);
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        // Node lebih padat -> radius koneksi sedikit lebih besar biar jaring menyatu.
+        linkDist = W < 640 ? 110 : 150;
+        const count = computeCount();
+        nodes = Array.from({ length: count }, makeNode);
+      }
+
+      // Cursor "volume spike": node dekat cursor membesar & koneksinya menguat sesaat.
+      const mouse = { x: -9999, y: -9999, active: false };
+      hero.addEventListener('pointermove', (e) => {
+        const rect = hero.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.active = true;
+      });
+      hero.addEventListener('pointerleave', () => { mouse.active = false; mouse.x = mouse.y = -9999; });
+
+      // "Signal flash": sesekali satu node berkedip & memancar garis ke 2–3 node terdekat.
+      let nextFlash = 2500 + Math.random() * 3500;
+      let flashTimer = 0;
+      function triggerFlash() {
+        if (!nodes.length) return;
+        const src = nodes[(Math.random() * nodes.length) | 0];
+        // cari 3 node terdekat
+        const near = nodes
+          .filter(n => n !== src)
+          .map(n => ({ n, d: (n.x - src.x) ** 2 + (n.y - src.y) ** 2 }))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, 3)
+          .map(o => o.n);
+        src.flashLinks = near;
+        src.flashLife = 1;
+        src.pulse = Math.max(src.pulse, 1);
+      }
+
+      function step(dt) {
+        for (const n of nodes) {
+          n.x += n.vx * dt * 0.06;
+          n.y += n.vy * dt * 0.06;
+          // wrap lembut di tepi
+          if (n.x < -20) n.x = W + 20; else if (n.x > W + 20) n.x = -20;
+          if (n.y < -20) n.y = H + 20; else if (n.y > H + 20) n.y = -20;
+
+          // cursor volume spike
+          if (mouse.active) {
+            const dx = n.x - mouse.x, dy = n.y - mouse.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < 120 * 120) n.pulse = Math.max(n.pulse, 1 - Math.sqrt(d2) / 120);
+          }
+          n.pulse *= 0.94;                 // decay balik ke normal
+          if (n.flashLife > 0) n.flashLife -= dt * 0.0016;
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Garis koneksi = korelasi. Makin dekat, makin solid.
+        for (let i = 0; i < nodes.length; i++) {
+          const a = nodes[i];
+          for (let j = i + 1; j < nodes.length; j++) {
+            const b = nodes[j];
+            const dx = a.x - b.x, dy = a.y - b.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist > linkDist) continue;
+            const t = 1 - dist / linkDist;              // 0..1, 1 = sangat dekat
+            let alpha = 0.08 + t * 0.07;                // ~0.08–0.15
+            const boost = Math.max(a.pulse, b.pulse);    // spike memperkuat garis
+            alpha += boost * 0.25;
+            ctx.strokeStyle = 'rgba(' + GOLD + ',' + alpha.toFixed(3) + ')';
+            ctx.lineWidth = 0.6 + boost * 0.8;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+
+        // Garis "signal flash" — pancaran terang sesaat ke node terdekat.
+        for (const n of nodes) {
+          if (n.flashLife > 0 && n.flashLinks) {
+            const a = Math.max(n.flashLife, 0);
+            ctx.strokeStyle = 'rgba(' + GOLD + ',' + (0.5 * a).toFixed(3) + ')';
+            ctx.lineWidth = 1.2;
+            for (const t of n.flashLinks) {
+              ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+            }
+          }
+        }
+
+        // Node
+        for (const n of nodes) {
+          const spike = n.pulse + Math.max(n.flashLife, 0);
+          const r = n.r * (1 + spike * 0.9);
+          const glow = 0.55 + spike * 0.45;
+          if (spike > 0.05) {
+            ctx.shadowColor = 'rgba(' + n.color + ',' + glow.toFixed(2) + ')';
+            ctx.shadowBlur = 8 + spike * 12;
+          } else {
+            ctx.shadowBlur = 0;
+          }
+          ctx.fillStyle = 'rgba(' + n.color + ',' + (0.65 + spike * 0.35).toFixed(2) + ')';
+          ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+      }
+
+      let last = 0;
+      function loop(now) {
+        if (!running) return;
+        const dt = Math.min(now - last, 48); last = now;
+        step(dt);
+        flashTimer += dt;
+        if (flashTimer >= nextFlash) { triggerFlash(); flashTimer = 0; nextFlash = 3000 + Math.random() * 4000; }
+        draw();
+        raf = requestAnimationFrame(loop);
+      }
+
+      function start() { if (running) return; running = true; last = performance.now(); raf = requestAnimationFrame(loop); }
+      function stop() { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
+
+      // Reduced motion: render satu frame statis (node + garis diam), tanpa loop.
+      if (prefersReduced) {
+        build(); draw();
+        window.addEventListener('resize', debounce(() => { build(); draw(); }, 200));
+        return;
+      }
+
+      // Pause saat hero keluar viewport (hemat CPU/baterai setelah user scroll).
+      const heroObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting && !document.hidden) start(); else stop(); });
+      }, { threshold: 0.05 });
+      heroObserver.observe(hero);
+
+      // Pause saat tab tidak aktif.
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stop();
+        else if (isHeroVisible()) start();
+      });
+
+      function isHeroVisible() {
+        const r = hero.getBoundingClientRect();
+        return r.bottom > 0 && r.top < window.innerHeight;
+      }
+
+      window.addEventListener('resize', debounce(() => {
+        const wasRunning = running; stop(); build(); if (wasRunning) start(); else draw();
+      }, 200));
+
+      build();
+      if (isHeroVisible()) start();
+
+      function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+    })();
+
+    /* ---------- Structured data (Product/Service) ---------- */
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Trading Insights Indonesia",
+      "serviceType": "Membership sinyal saham harian & komunitas Discord",
+      "areaServed": "ID",
+      "description": "Membership premium berbasis Discord dengan sinyal saham harian, edukasi, dan konsultasi portofolio.",
+      "offers": [
+        { "@type": "Offer", "name": "Premium", "price": "230000", "priceCurrency": "IDR", "category": "Monthly membership" },
+        { "@type": "Offer", "name": "Platinum", "price": "850000", "priceCurrency": "IDR", "category": "Monthly membership" }
+      ]
+    };
+    const ldScript = document.createElement('script');
+    ldScript.type = 'application/ld+json';
+    ldScript.textContent = JSON.stringify(ld);
+    document.head.appendChild(ldScript);
+  })();
+  </script>
+</body>
+</html>
