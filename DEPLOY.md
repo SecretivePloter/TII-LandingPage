@@ -175,6 +175,12 @@ Semua update gambar dilakukan di **`/admin.html`** — nggak perlu sentuh kode l
 - Klik **🗑** di kartu → konfirmasi. Gambar & datanya hilang permanen (dari database dan
   dari storage), dan langsung hilang dari landing page.
 
+### Mengganti logo (header, hero, & tab browser)
+- Di dashboard admin, bagian paling atas **"Logo & Branding"**, klik **Pilih logo** lalu
+  pilih file logo kamu (PNG atau SVG transparan paling bagus). Logo langsung dipakai di
+  header, di awal halaman (hero), dan sebagai ikon tab browser. Upload lagi kapan pun untuk
+  menggantinya. Setelah upload, refresh landing page untuk lihat hasilnya.
+
 **Peta kategori ke section landing page:**
 - `testimoni` → Bukti Sosial → "Kata Member"
 - `hasil-tp` → Bukti Sosial → "Hasil Take Profit"
