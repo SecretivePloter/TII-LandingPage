@@ -1,9 +1,11 @@
 User-agent: *
 Allow: /
 
-# Admin panel must never be indexed
+# Admin panel must never be indexed (cleanUrls bikin /admin.html -> /admin)
+Disallow: /admin
 Disallow: /admin.html
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: /sitemap.xml
+# TODO(domain): ganti ke domain final setelah beli.
+Sitemap: https://tradinginsightindonesia.vercel.app/sitemap.xml

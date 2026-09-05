@@ -9,21 +9,27 @@
   <link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230A0E14'/%3E%3Cg fill='none' stroke='%23D4AF6A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l5-5 3 3 4-6 4 4'/%3E%3Cpath d='M14 9h5v5'/%3E%3C/g%3E%3C/svg%3E" />
 
   <!-- ===== SEO ===== -->
-  <title>Trading Insights Indonesia | Sinyal Saham Harian & Membership Discord Terpercaya</title>
-  <meta name="description" content="Membership premium berbasis Discord dengan sinyal saham harian dari analyst berpengalaman. Rekomendasi saham Indonesia, swing, day trade, scalping, BSJP, plus komunitas aktif dan edukasi. Bukti transparan, lihat sendiri." />
+  <!-- TODO(domain): saat beli domain sendiri, ganti semua "https://tradinginsightindonesia.vercel.app"
+       di file ini (canonical + og:image + og:url), di sitemap.xml, dan di robots.txt. -->
+  <title>Sinyal Saham Harian & Membership Discord | Trading Insights ID</title>
+  <meta name="description" content="Sinyal saham harian dari analyst berpengalaman lewat membership Discord: swing, day trade, scalping, BSJP, plus komunitas aktif dan edukasi saham." />
   <meta name="keywords" content="sinyal saham harian, rekomendasi saham Indonesia, membership trading saham, grup sinyal saham terpercaya, komunitas trading saham, edukasi saham" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://DOMAIN-KAMU.vercel.app/" />
+  <link rel="canonical" href="https://tradinginsightindonesia.vercel.app/" />
 
   <!-- ===== Open Graph / social share ===== -->
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tradinginsightindonesia.vercel.app/" />
   <meta property="og:title" content="Trading Insights Indonesia | Sinyal Saham Harian" />
   <meta property="og:description" content="Berhenti trading dari feeling. Dapat sinyal harian, edukasi, dan komunitas Discord aktif. Bukti transparan di dalam." />
   <meta property="og:site_name" content="Trading Insights Indonesia" />
-  <meta property="og:image" content="https://DOMAIN-KAMU.vercel.app/og-image.png" />
+  <meta property="og:image" content="https://tradinginsightindonesia.vercel.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Trading Insights Indonesia | Sinyal Saham Harian" />
   <meta name="twitter:description" content="Berhenti trading dari feeling. Sinyal harian + komunitas Discord aktif." />
+  <meta name="twitter:image" content="https://tradinginsightindonesia.vercel.app/og-image.png" />
 
   <!-- ===== Fonts: Sora (display), Instrument Sans (body), Spline Sans Mono (angka) ===== -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -190,8 +196,9 @@
 
     <div class="relative max-w-6xl mx-auto px-5 w-full grid lg:grid-cols-12 gap-10 items-center">
       <div class="lg:col-span-8">
-        <!-- Logo besar di awal halaman (muncul kalau sudah di-upload lewat admin) -->
-        <img id="heroLogo" class="hidden h-20 sm:h-24 w-auto mb-8 object-contain drop-shadow-[0_6px_30px_rgba(201,162,75,.35)]" alt="Logo Trading Insights Indonesia" />
+        <!-- Logo besar di awal halaman (muncul kalau sudah di-upload lewat admin).
+             Mobile: center + jarak lega sebelum konten. Desktop (sm+): rata kiri. -->
+        <img id="heroLogo" class="hidden h-20 sm:h-24 w-auto mx-auto sm:mx-0 mt-2 sm:mt-0 mb-12 sm:mb-8 object-contain drop-shadow-[0_6px_30px_rgba(201,162,75,.35)]" alt="Logo Trading Insights Indonesia" />
         <span class="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-navy-card/60 px-3.5 py-1.5 text-xs text-gold-light backdrop-blur-sm">
           <span class="w-1.5 h-1.5 rounded-full bg-teal animate-pulse"></span>
           Komunitas Discord aktif tiap hari bursa
@@ -924,7 +931,7 @@
         hdr.src = url; hdr.classList.remove('hidden');
         document.getElementById('headerLogoMark').classList.add('hidden');
         const hero = document.getElementById('heroLogo');
-        hero.src = url; hero.classList.remove('hidden');
+        hero.src = url; hero.classList.remove('hidden'); hero.classList.add('block');
         const fav = document.getElementById('favicon');
         if (fav) fav.href = url;
       };

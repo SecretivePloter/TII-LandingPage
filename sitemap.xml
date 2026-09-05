@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- TODO: ganti https://DOMAIN-KAMU.vercel.app dengan domain final kamu setelah deploy. -->
-<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">
+<!-- TODO(domain): ganti https://tradinginsightindonesia.vercel.app dengan domain final setelah beli. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://DOMAIN-KAMU.vercel.app/</loc>
+    <loc>https://tradinginsightindonesia.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
