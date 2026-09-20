@@ -129,6 +129,54 @@
     .gallery-img { opacity: .9; transition: opacity .6s ease, transform .5s ease; }
     .gallery-item:hover .gallery-img { opacity: 1; transform: translateY(-4px); }
 
+    /* ===================== ORBIT (section Fitur) =====================
+       5 menu sinyal ngorbit ngelilingi pusat (CTA Discord). Tanpa kotak, jadi
+       canvas partikel di belakang nembus keliatan. Teks di-counter-rotate biar
+       selalu tegak walau kartunya muter. */
+    .orbit-stage { position: relative; width: 560px; height: 560px; margin: 0 auto; }
+    .orbit-path { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(201,162,75,.18); }
+    .orbit-path::after { content: ''; position: absolute; inset: 14%; border-radius: 50%; border: 1px dashed rgba(201,162,75,.08); }
+    .orbit-ring { position: absolute; inset: 0; animation: orbit-spin 52s linear infinite; }
+    .orbit-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .slot {
+      position: absolute; left: 50%; top: 50%;
+      --angle: calc(-90deg + 72deg * var(--i));
+      transform: rotate(var(--angle)) translate(230px);
+    }
+    .counter { animation: orbit-spin-rev 52s linear infinite; }
+    .ocard {
+      transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle)));
+      width: 168px; text-align: center; cursor: default; transition: transform .25s ease;
+    }
+    .ocard::before {
+      content: ''; position: absolute; left: 50%; top: 50%; width: 180px; height: 180px;
+      transform: translate(-50%,-50%); z-index: -1; border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(10,14,20,.85), rgba(10,14,20,.35) 55%, transparent 75%);
+    }
+    .ocard h3, .ocard p { text-shadow: 0 2px 14px rgba(10,14,20,.9); }
+    .onode {
+      width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 14px;
+      display: grid; place-items: center; color: #D4AF6A;
+      background: radial-gradient(closest-side, rgba(201,162,75,.14), transparent);
+      box-shadow: 0 0 0 1px rgba(201,162,75,.22), 0 0 24px -6px rgba(201,162,75,.5);
+      transition: box-shadow .25s ease, transform .25s ease;
+    }
+    .onum { font-family: var(--font-mono); font-size: 11px; color: rgba(232,230,225,.4); }
+    .orbit-stage:hover .orbit-ring, .orbit-stage:hover .counter { animation-play-state: paused; }
+    .ocard:hover .onode { box-shadow: 0 0 0 1px rgba(201,162,75,.6), 0 0 34px -4px rgba(201,162,75,.8); transform: scale(1.08); }
+    .orbit-center {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 208px; text-align: center; z-index: 5;
+    }
+    @keyframes orbit-spin     { to { transform: rotate(360deg); } }
+    @keyframes orbit-spin-rev { to { transform: rotate(-360deg); } }
+    @media (prefers-reduced-motion: reduce) { .orbit-ring, .counter { animation: none; } }
+    .orbit-list { display: none; }
+    @media (max-width: 1023px) {
+      .orbit-stage { display: none; }
+      .orbit-list { display: block; }
+    }
+
     /* Scrollbar hint dalam gold */
     ::selection { background: rgba(201,162,75,.3); }
   </style>
@@ -258,7 +306,7 @@
   </section>
 
   <!-- ============================ MASALAH / AGITASI ============================ -->
-  <section id="masalah" class="relative z-10 py-24 border-t border-navy-line/40">
+  <section id="masalah" class="relative z-10 py-24">
     <div class="max-w-6xl mx-auto px-5">
       <p class="rule text-sm font-500 text-gold-light reveal">Kenapa porto kamu bocor</p>
       <div class="mt-5 grid lg:grid-cols-2 gap-12 items-start">
@@ -310,7 +358,7 @@
   </section>
 
   <!-- ============================ FITUR HARIAN ============================ -->
-  <section id="fitur" class="relative z-10 py-24 bg-navy-deep/80 border-y border-navy-line/40">
+  <section id="fitur" class="relative z-10 py-24">
     <div class="max-w-6xl mx-auto px-5">
       <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
         <div>
@@ -325,81 +373,95 @@
         </p>
       </div>
 
-      <div class="mt-14 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <!-- Swing -->
-        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
-          <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 15l4-6 4 3 4-8 6 5"/><path d="M3 20h18"/></svg>
-            </div>
-            <span class="font-mono text-xs text-ink/40">01</span>
-          </div>
-          <h3 class="mt-5 font-display font-600 text-lg">Swing Trading</h3>
-          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Posisi beberapa hari sampai minggu. Cocok buat kamu yang nggak bisa pantau layar seharian.</p>
-        </article>
+      <!-- ============ ORBIT (desktop) ============ -->
+      <div class="orbit-stage mt-10 reveal">
+        <div class="orbit-path"></div>
 
-        <!-- Valid Buy, TANPA klaim winrate -->
-        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal ring-1 ring-gold/20">
-          <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-            </div>
-            <span class="font-mono text-xs text-ink/40">02</span>
-          </div>
-          <h3 class="mt-5 font-display font-600 text-lg">Valid Buy</h3>
-          <p class="mt-2 text-sm text-ink/60 leading-relaxed">
-            Momen entry yang sudah lolos filter teknikal analyst. Track record kami transparan,
-            <a href="#bukti" class="text-gold-light underline underline-offset-2 hover:text-gold">lihat sendiri buktinya di bawah 👇</a>
-          </p>
-        </article>
-
-        <!-- Day Trade -->
-        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
-          <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            </div>
-            <span class="font-mono text-xs text-ink/40">03</span>
-          </div>
-          <h3 class="mt-5 font-display font-600 text-lg">Day Trade</h3>
-          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Buka-tutup posisi di hari yang sama. Sinyal masuk pas jam bursa, langsung actionable.</p>
-        </article>
-
-        <!-- Live Trade / Scalping -->
-        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
-          <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg>
-            </div>
-            <span class="font-mono text-xs text-ink/40">04</span>
-          </div>
-          <h3 class="mt-5 font-display font-600 text-lg">Live Trade / Scalping</h3>
-          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Arahan cepat lewat voice channel saat market bergerak. Buat yang main tipis-tipis rapat.</p>
-        </article>
-
-        <!-- BSJP -->
-        <article class="card rounded-2xl p-7 hover:border-gold/40 transition reveal">
-          <div class="flex items-center justify-between">
-            <div class="w-12 h-12 rounded-xl bg-navy-base grid place-items-center text-gold-light">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0"/><path d="M12 2v7M12 9l3-3M12 9L9 6"/><path d="M3 18h18"/></svg>
-            </div>
-            <span class="font-mono text-xs text-ink/40">05</span>
-          </div>
-          <h3 class="mt-5 font-display font-600 text-lg">BSJP <span class="text-ink/45 font-body font-400 text-sm">(Beli Sore Jual Pagi)</span></h3>
-          <p class="mt-2 text-sm text-ink/60 leading-relaxed">Strategi overnight yang manfaatin gap pagi. Setup sore, panen pas market buka.</p>
-        </article>
-
-        <!-- CTA card -->
-        <article class="rounded-2xl p-7 flex flex-col justify-between bg-gradient-to-br from-navy-card to-navy-base border border-gold/25 glow-gold reveal">
-          <div>
-            <h3 class="font-display font-700 text-lg text-gold-light">Semua menu dalam satu Discord.</h3>
-            <p class="mt-2 text-sm text-ink/70 leading-relaxed">Nggak perlu loncat-loncat grup. Satu tempat, semua sinyal, plus tim yang bisa ditanya.</p>
-          </div>
+        <!-- Pusat: hub Discord (statis, selalu bisa diklik) -->
+        <div class="orbit-center">
+          <h3 class="font-display font-700 text-lg text-gold-light">Semua menu, satu Discord.</h3>
+          <p class="mt-2 text-sm text-ink/70 leading-relaxed">Nggak perlu loncat grup. Satu tempat, semua sinyal, plus tim yang bisa ditanya.</p>
           <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
-             class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-5 py-3 text-sm font-600 text-navy-base hover:bg-gold-light transition">
+             class="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-600 text-navy-base hover:bg-gold-light transition glow-gold">
             Masuk sekarang
           </a>
-        </article>
+        </div>
+
+        <!-- Ring berputar (bawa kartu + garis korelasi) -->
+        <div class="orbit-ring">
+          <svg class="orbit-lines" viewBox="0 0 560 560" fill="none" stroke="rgba(201,162,75,.22)" stroke-width="1" aria-hidden="true">
+            <line x1="280" y1="280" x2="280"   y2="50"  />
+            <line x1="280" y1="280" x2="498.7" y2="208.9" />
+            <line x1="280" y1="280" x2="415.2" y2="466.1" />
+            <line x1="280" y1="280" x2="144.8" y2="466.1" />
+            <line x1="280" y1="280" x2="61.3"  y2="208.9" />
+          </svg>
+
+          <div class="slot" style="--i:0"><div class="counter"><div class="ocard">
+            <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 15l4-6 4 3 4-8 6 5"/><path d="M3 20h18"/></svg></div>
+            <span class="onum">01</span>
+            <h3 class="mt-1 font-display font-600 text-base">Swing Trading</h3>
+            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Posisi beberapa hari sampai minggu. Cocok buat yang nggak bisa pantau layar seharian.</p>
+          </div></div></div>
+
+          <div class="slot" style="--i:1"><div class="counter"><div class="ocard">
+            <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <span class="onum">02</span>
+            <h3 class="mt-1 font-display font-600 text-base">Valid Buy</h3>
+            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Momen entry yang sudah lolos filter teknikal analyst. <a href="#bukti" class="text-gold-light underline underline-offset-2 hover:text-gold">lihat buktinya</a>.</p>
+          </div></div></div>
+
+          <div class="slot" style="--i:2"><div class="counter"><div class="ocard">
+            <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+            <span class="onum">03</span>
+            <h3 class="mt-1 font-display font-600 text-base">Day Trade</h3>
+            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Buka-tutup posisi di hari yang sama. Sinyal masuk pas jam bursa, langsung actionable.</p>
+          </div></div></div>
+
+          <div class="slot" style="--i:3"><div class="counter"><div class="ocard">
+            <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg></div>
+            <span class="onum">04</span>
+            <h3 class="mt-1 font-display font-600 text-base">Live / Scalping</h3>
+            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Arahan cepat lewat voice channel saat market bergerak. Buat yang main tipis-tipis rapat.</p>
+          </div></div></div>
+
+          <div class="slot" style="--i:4"><div class="counter"><div class="ocard">
+            <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0"/><path d="M12 2v7M12 9l3-3M12 9L9 6"/><path d="M3 18h18"/></svg></div>
+            <span class="onum">05</span>
+            <h3 class="mt-1 font-display font-600 text-base">BSJP</h3>
+            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Beli Sore Jual Pagi. Strategi overnight yang manfaatin gap pagi.</p>
+          </div></div></div>
+        </div>
+      </div>
+
+      <!-- ============ FALLBACK (mobile / tablet) ============ -->
+      <div class="orbit-list mt-12 space-y-8">
+        <div class="flex gap-4 reveal">
+          <div class="onode shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 15l4-6 4 3 4-8 6 5"/><path d="M3 20h18"/></svg></div>
+          <div><span class="onum">01</span><h3 class="font-display font-600 text-base">Swing Trading</h3><p class="mt-1 text-sm text-ink/60">Posisi beberapa hari sampai minggu. Cocok buat yang nggak bisa pantau layar seharian.</p></div>
+        </div>
+        <div class="flex gap-4 reveal">
+          <div class="onode shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div><span class="onum">02</span><h3 class="font-display font-600 text-base">Valid Buy</h3><p class="mt-1 text-sm text-ink/60">Momen entry yang sudah lolos filter teknikal analyst. <a href="#bukti" class="text-gold-light underline underline-offset-2 hover:text-gold">lihat buktinya di bawah 👇</a></p></div>
+        </div>
+        <div class="flex gap-4 reveal">
+          <div class="onode shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div><span class="onum">03</span><h3 class="font-display font-600 text-base">Day Trade</h3><p class="mt-1 text-sm text-ink/60">Buka-tutup posisi di hari yang sama. Sinyal masuk pas jam bursa, langsung actionable.</p></div>
+        </div>
+        <div class="flex gap-4 reveal">
+          <div class="onode shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg></div>
+          <div><span class="onum">04</span><h3 class="font-display font-600 text-base">Live Trade / Scalping</h3><p class="mt-1 text-sm text-ink/60">Arahan cepat lewat voice channel saat market bergerak. Buat yang main tipis-tipis rapat.</p></div>
+        </div>
+        <div class="flex gap-4 reveal">
+          <div class="onode shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0"/><path d="M12 2v7M12 9l3-3M12 9L9 6"/><path d="M3 18h18"/></svg></div>
+          <div><span class="onum">05</span><h3 class="font-display font-600 text-base">BSJP <span class="text-ink/45 font-body font-400 text-sm">(Beli Sore Jual Pagi)</span></h3><p class="mt-1 text-sm text-ink/60">Strategi overnight yang manfaatin gap pagi. Setup sore, panen pas market buka.</p></div>
+        </div>
+        <div class="pt-2 reveal">
+          <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
+             class="inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-5 py-3 text-sm font-600 text-navy-base hover:bg-gold-light transition glow-gold">
+            Masuk Discord sekarang
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -437,7 +499,7 @@
   </section>
 
   <!-- ============================ KREDIBILITAS ============================ -->
-  <section id="analyst" class="relative z-10 py-24 bg-navy-deep/80 border-y border-navy-line/40">
+  <section id="analyst" class="relative z-10 py-24">
     <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-12 gap-12 items-start">
       <div class="lg:col-span-5">
         <p class="rule text-sm font-500 text-gold-light reveal">Bukan sekadar grup sinyal</p>
@@ -580,7 +642,7 @@
   </section>
 
   <!-- ============================ FAQ ============================ -->
-  <section id="faq" class="relative z-10 py-24 bg-navy-deep/80 border-y border-navy-line/40">
+  <section id="faq" class="relative z-10 py-24">
     <div class="max-w-3xl mx-auto px-5">
       <p class="rule text-sm font-500 text-gold-light reveal text-center">Sebelum kamu ragu</p>
       <h2 class="mt-5 font-display font-700 text-3xl sm:text-4xl leading-tight text-center reveal">Pertanyaan yang jujur, jawaban yang jujur.</h2>
