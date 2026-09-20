@@ -130,51 +130,65 @@
     .gallery-item:hover .gallery-img { opacity: 1; transform: translateY(-4px); }
 
     /* ===================== ORBIT (section Fitur) =====================
-       5 menu sinyal ngorbit ngelilingi pusat (CTA Discord). Tanpa kotak, jadi
-       canvas partikel di belakang nembus keliatan. Teks di-counter-rotate biar
-       selalu tegak walau kartunya muter. */
-    .orbit-stage { position: relative; width: 560px; height: 560px; margin: 0 auto; }
-    .orbit-path { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(201,162,75,.18); }
-    .orbit-path::after { content: ''; position: absolute; inset: 14%; border-radius: 50%; border: 1px dashed rgba(201,162,75,.08); }
-    .orbit-ring { position: absolute; inset: 0; animation: orbit-spin 52s linear infinite; }
+       5 menu sinyal ngipas di setengah lingkaran ATAS, hub CTA Discord di
+       bawah-tengah sebagai pusat. Tanpa kotak, jadi canvas partikel nembus.
+       Nggak muter penuh (bikin numpuk); cukup ayunan halus biar tetap hidup
+       tapi teks gampang dibaca. Kartu di-counter-rotate biar selalu tegak. */
+    .orbit-stage { position: relative; width: min(820px, 100%); height: 500px; margin: 0 auto; }
+    .orbit-arc { position: absolute; inset: 0; transform-origin: 50% 78%; animation: orbit-sway 11s ease-in-out infinite; }
     .orbit-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
     .slot {
-      position: absolute; left: 50%; top: 50%;
-      --angle: calc(-90deg + 72deg * var(--i));
-      transform: rotate(var(--angle)) translate(230px);
+      position: absolute; left: 50%; top: 78%;
+      --angle: calc(180deg + 45deg * var(--i));   /* 180..360 = setengah lingkaran atas */
+      transform: rotate(var(--angle)) translate(270px);
     }
-    .counter { animation: orbit-spin-rev 52s linear infinite; }
     .ocard {
       transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle)));
-      width: 168px; text-align: center; cursor: default; transition: transform .25s ease;
+      width: 180px; text-align: center; cursor: default; transition: transform .25s ease;
     }
     .ocard::before {
-      content: ''; position: absolute; left: 50%; top: 50%; width: 180px; height: 180px;
+      content: ''; position: absolute; left: 50%; top: 50%; width: 200px; height: 200px;
       transform: translate(-50%,-50%); z-index: -1; border-radius: 50%;
-      background: radial-gradient(closest-side, rgba(10,14,20,.85), rgba(10,14,20,.35) 55%, transparent 75%);
+      background: radial-gradient(closest-side, rgba(10,14,20,.82), rgba(10,14,20,.32) 55%, transparent 75%);
     }
     .ocard h3, .ocard p { text-shadow: 0 2px 14px rgba(10,14,20,.9); }
     .onode {
-      width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 14px;
+      width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 14px;
       display: grid; place-items: center; color: #D4AF6A;
       background: radial-gradient(closest-side, rgba(201,162,75,.14), transparent);
       box-shadow: 0 0 0 1px rgba(201,162,75,.22), 0 0 24px -6px rgba(201,162,75,.5);
       transition: box-shadow .25s ease, transform .25s ease;
     }
     .onum { font-family: var(--font-mono); font-size: 11px; color: rgba(232,230,225,.4); }
-    .orbit-stage:hover .orbit-ring, .orbit-stage:hover .counter { animation-play-state: paused; }
+    .orbit-stage:hover .orbit-arc { animation-play-state: paused; }
+    .ocard:hover { transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle))) scale(1.06); }
     .ocard:hover .onode { box-shadow: 0 0 0 1px rgba(201,162,75,.6), 0 0 34px -4px rgba(201,162,75,.8); transform: scale(1.08); }
     .orbit-center {
-      position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
-      width: 208px; text-align: center; z-index: 5;
+      position: absolute; left: 50%; top: 78%; transform: translate(-50%,-50%);
+      width: 240px; text-align: center; z-index: 5;
     }
-    @keyframes orbit-spin     { to { transform: rotate(360deg); } }
-    @keyframes orbit-spin-rev { to { transform: rotate(-360deg); } }
-    @media (prefers-reduced-motion: reduce) { .orbit-ring, .counter { animation: none; } }
+    @keyframes orbit-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+    @media (prefers-reduced-motion: reduce) { .orbit-arc { animation: none; } }
     .orbit-list { display: none; }
     @media (max-width: 1023px) {
       .orbit-stage { display: none; }
       .orbit-list { display: block; }
+    }
+
+    /* ===================== RUNNING TICKER (header) =====================
+       Bar tipis di paling atas, harga saham jalan kiri. Muncul cuma kalau ada
+       ticker terdaftar (JS nambahin class .has-ticker di <html>). */
+    html { scroll-padding-top: 4rem; }
+    html.has-ticker { scroll-padding-top: 6.5rem; }
+    html.has-ticker header { top: 2.25rem; }              /* header turun setinggi ticker bar */
+    html.has-ticker #hero { padding-top: 6.5rem; }        /* hero clear dari ticker + header */
+
+    .ticker-track { display: inline-flex; align-items: center; gap: 1.75rem; white-space: nowrap; will-change: transform; padding-left: 1.75rem; animation: ticker-scroll linear infinite; }
+    .ticker-track:hover { animation-play-state: paused; }
+    @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) {
+      .ticker-track { animation: none; }
+      #tickerScroll { overflow-x: auto; }
     }
 
     /* Scrollbar hint dalam gold */
@@ -187,6 +201,21 @@
   <!-- Market Pulse: canvas partikel full-page (fixed, di belakang semua konten) -->
   <canvas id="marketPulse" aria-hidden="true"></canvas>
   <div id="pageVeil" aria-hidden="true"></div>
+
+  <!-- ============================ RUNNING TICKER ============================ -->
+  <!-- Harga IDX dari Yahoo Finance (delayed ~15m), di-cache di edge. Bar ini
+       disembunyiin sampai JS memastikan ada ticker terdaftar. -->
+  <div id="tickerBar" class="fixed top-0 inset-x-0 z-50 h-9 bg-navy-deep/95 border-b border-navy-line/60 backdrop-blur-md overflow-hidden hidden" aria-label="Harga saham IDX (delayed)">
+    <div class="flex items-center h-full">
+      <span class="shrink-0 flex items-center gap-1.5 px-3 h-full text-gold-light text-[11px] font-600 bg-gold/10 border-r border-navy-line/60">
+        <span class="w-1.5 h-1.5 rounded-full bg-teal animate-pulse"></span> IDX
+      </span>
+      <div id="tickerScroll" class="relative flex-1 overflow-hidden h-full">
+        <div id="tickerTrack" class="ticker-track h-full text-xs"></div>
+      </div>
+      <span class="shrink-0 px-3 text-[10px] text-ink/35 border-l border-navy-line/60 hidden sm:block">delay ~15m</span>
+    </div>
+  </div>
 
   <!-- ============================ NAV ============================ -->
   <header class="fixed top-0 inset-x-0 z-40 border-b border-navy-line/60 bg-navy-base/80 backdrop-blur-md">
@@ -375,8 +404,6 @@
 
       <!-- ============ ORBIT (desktop) ============ -->
       <div class="orbit-stage mt-10 reveal">
-        <div class="orbit-path"></div>
-
         <!-- Pusat: hub Discord (statis, selalu bisa diklik) -->
         <div class="orbit-center">
           <h3 class="font-display font-700 text-lg text-gold-light">Semua menu, satu Discord.</h3>
@@ -387,14 +414,14 @@
           </a>
         </div>
 
-        <!-- Ring berputar (bawa kartu + garis korelasi) -->
-        <div class="orbit-ring">
-          <svg class="orbit-lines" viewBox="0 0 560 560" fill="none" stroke="rgba(201,162,75,.22)" stroke-width="1" aria-hidden="true">
-            <line x1="280" y1="280" x2="280"   y2="50"  />
-            <line x1="280" y1="280" x2="498.7" y2="208.9" />
-            <line x1="280" y1="280" x2="415.2" y2="466.1" />
-            <line x1="280" y1="280" x2="144.8" y2="466.1" />
-            <line x1="280" y1="280" x2="61.3"  y2="208.9" />
+        <!-- Fan setengah lingkaran (bawa kartu + garis korelasi), ayun halus -->
+        <div class="orbit-arc">
+          <svg class="orbit-lines" viewBox="0 0 820 500" fill="none" stroke="rgba(201,162,75,.22)" stroke-width="1" aria-hidden="true">
+            <line x1="410" y1="390" x2="140"   y2="390" />
+            <line x1="410" y1="390" x2="219.1" y2="199.1" />
+            <line x1="410" y1="390" x2="410"   y2="120" />
+            <line x1="410" y1="390" x2="600.9" y2="199.1" />
+            <line x1="410" y1="390" x2="680"   y2="390" />
           </svg>
 
           <div class="slot" style="--i:0"><div class="counter"><div class="ocard">
@@ -1041,6 +1068,59 @@
     }
 
     loadGalleries();
+
+    /* =====================================================================
+       RUNNING TICKER, harga IDX dari /api/quotes (Yahoo, delayed, cached edge)
+       ===================================================================== */
+    (function runningTicker() {
+      const bar = document.getElementById('tickerBar');
+      const track = document.getElementById('tickerTrack');
+      if (!bar || !track) return;
+      const POLL_MS = 3 * 60 * 1000;   // refresh tiap 3 menit
+
+      const fmt = (n) => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 });
+
+      function itemHTML(q) {
+        const up = q.change > 0, down = q.change < 0;
+        const color = up ? '#3FB58F' : (down ? '#E5674E' : 'rgba(232,230,225,.5)');
+        const arrow = up ? '▲' : (down ? '▼' : '•');
+        const sign = q.changePct > 0 ? '+' : '';
+        return '<span class="inline-flex items-center gap-1.5">' +
+                 '<span class="font-600 text-ink/90">' + escapeText(q.symbol) + '</span>' +
+                 '<span class="font-mono text-ink/65">' + fmt(q.price) + '</span>' +
+                 '<span class="font-mono" style="color:' + color + '">' + arrow + ' ' + sign + q.changePct + '%</span>' +
+               '</span>';
+      }
+
+      function render(quotes) {
+        if (!quotes || !quotes.length) { bar.classList.add('hidden'); document.documentElement.classList.remove('has-ticker'); return; }
+        const sep = '<span class="text-navy-line px-1">|</span>';
+        const row = quotes.map(itemHTML).join(sep);
+        // Digandakan 2x supaya loop marquee mulus (animasi geser -50%).
+        track.innerHTML = row + sep + row + sep;
+        const dur = Math.max(quotes.length * 4, 30);
+        track.style.animationDuration = dur + 's';
+        bar.classList.remove('hidden');
+        document.documentElement.classList.add('has-ticker');
+      }
+
+      async function load() {
+        try {
+          const res = await fetch('/api/quotes');
+          if (!res.ok) throw new Error('quotes');
+          const data = await res.json();
+          render(data.quotes);
+        } catch (err) {
+          // Diam-diam sembunyiin bar kalau gagal, jangan ganggu landing page.
+          console.error('[ticker]', err.message);
+          bar.classList.add('hidden');
+          document.documentElement.classList.remove('has-ticker');
+        }
+      }
+
+      load();
+      setInterval(load, POLL_MS);
+    })();
 
     /* =====================================================================
        MARKET PULSE, interactive particle network (native canvas)

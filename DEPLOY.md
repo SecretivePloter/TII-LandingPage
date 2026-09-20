@@ -181,6 +181,18 @@ Semua update gambar dilakukan di **`/admin.html`** — nggak perlu sentuh kode l
   header, di awal halaman (hero), dan sebagai ikon tab browser. Upload lagi kapan pun untuk
   menggantinya. Setelah upload, refresh landing page untuk lihat hasilnya.
 
+### Mengatur running ticker saham (bar harga di atas header)
+- Di dashboard admin, bagian **"Running Ticker Saham"**, ketik kode saham IDX (mis.
+  `BBCA`, `BBRI`) lalu **Tambah**. Cukup kodenya, tanpa akhiran apa pun.
+- Harga ditarik otomatis dari Yahoo Finance (**delay ~15 menit**) dan refresh sendiri
+  tiap beberapa menit. Kamu nggak perlu isi harga manual.
+- **Drag** chip untuk atur urutan, klik **×** untuk hapus.
+- Kalau daftar kosong, bar ticker otomatis disembunyikan di landing page.
+
+> Catatan: fitur ticker butuh tabel `tickers` di database. Kalau kamu setup dari
+> versi lama, buka Supabase → SQL Editor → jalankan ulang seluruh isi
+> `supabase/schema.sql` (aman diulang, pakai `create ... if not exists`).
+
 **Peta kategori ke section landing page:**
 - `testimoni` → Bukti Sosial → "Kata Member"
 - `hasil-tp` → Bukti Sosial → "Hasil Take Profit"

@@ -43,6 +43,33 @@ create policy "public read"
 -- Sengaja TIDAK ada policy insert/update/delete untuk anon → operasi tulis dari
 -- browser dengan anon key akan gagal. Itu memang tujuannya.
 
+-- -----------------------------------------------------------------------------
+-- Table: tickers
+-- Daftar kode saham yang tampil di running ticker (header). Harga TIDAK disimpan
+-- di sini; harga ditarik on-the-fly dari Yahoo Finance oleh /api/quotes lalu
+-- di-cache di edge. Di sini cuma simpan kode + urutan tampil.
+-- Kelola lewat /admin.html (tambah/hapus/urutkan).
+-- -----------------------------------------------------------------------------
+create table if not exists tickers (
+  id            uuid primary key default gen_random_uuid(),
+  symbol        text not null,                 -- kode IDX tanpa akhiran, mis. BBCA
+  display_order integer not null default 0,
+  created_at    timestamptz default now()
+);
+
+create unique index if not exists tickers_symbol_uidx on tickers (upper(symbol));
+create index if not exists tickers_order_idx on tickers (display_order);
+
+alter table tickers enable row level security;
+
+drop policy if exists "public read tickers" on tickers;
+create policy "public read tickers"
+  on tickers
+  for select
+  using (true);
+
+-- Sama seperti assets: tulis hanya lewat serverless (service_role). Anon read-only.
+
 -- =============================================================================
 -- CATATAN STORAGE (tidak bisa lewat SQL biasa — lakukan di Dashboard):
 --   1. Storage → New bucket → nama: proof-assets → centang "Public bucket".

@@ -100,6 +100,24 @@
         </div>
       </section>
 
+      <!-- Running Ticker Saham -->
+      <section class="card rounded-2xl p-6 mb-8">
+        <div class="flex items-start justify-between gap-4 flex-wrap mb-4">
+          <div>
+            <h2 class="font-semibold">Running Ticker Saham</h2>
+            <p class="text-xs text-ink/50 mt-1">Kode saham IDX yang jalan di bar atas landing page. Harga otomatis dari Yahoo Finance (delay ~15 menit), refresh tiap beberapa menit. Cukup kode-nya saja, mis. <span class="mono text-gold-light">BBCA</span>.</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <input id="tickerInput" type="text" placeholder="Kode saham (mis. BBRI)" maxlength="6" autocapitalize="characters"
+                 class="flex-1 rounded-lg bg-navy-deep border border-navy-line px-3.5 py-2.5 text-sm uppercase outline-none focus:border-gold/60" />
+          <button id="tickerAddBtn" class="rounded-lg bg-gold px-5 py-2.5 text-sm font-semibold text-navy-base hover:bg-gold-light transition disabled:opacity-50">Tambah</button>
+        </div>
+        <p id="tickerMsg" class="mt-2 text-xs hidden"></p>
+        <div id="tickerList" class="mt-4 flex flex-wrap gap-2"></div>
+        <p id="tickerListMsg" class="mt-2 text-xs text-ink/40">Drag chip untuk atur urutan · × untuk hapus</p>
+      </section>
+
       <!-- Tabs -->
       <div id="tabs" class="flex flex-wrap gap-2 mb-8">
         <button data-tab="testimoni" class="tab rounded-lg px-4 py-2 text-sm card">Testimoni</button>
@@ -213,7 +231,95 @@
       showDash();
       try { await initSupabase(); } catch (ex) { $('listMsg').textContent = ex.message; }
       loadLogoPreview();
+      loadTickers();
       setTab(currentCat);
+    }
+
+    /* ---------- Running ticker saham ---------- */
+    async function loadTickers() {
+      const wrap = $('tickerList');
+      try {
+        await initSupabase();
+        const { data, error } = await sb.from('tickers').select('*').order('display_order', { ascending: true });
+        if (error) throw error;
+        wrap.innerHTML = '';
+        if (!data.length) { $('tickerListMsg').textContent = 'Belum ada ticker. Tambah kode saham di atas.'; return; }
+        $('tickerListMsg').textContent = 'Drag chip untuk atur urutan · × untuk hapus';
+        data.forEach(t => wrap.appendChild(tickerChip(t)));
+      } catch (ex) {
+        $('tickerListMsg').textContent = 'Gagal memuat ticker: ' + ex.message;
+      }
+    }
+
+    function tickerChip(t) {
+      const el = document.createElement('div');
+      el.className = 'ticker-chip inline-flex items-center gap-2 rounded-lg card px-3 py-1.5 text-sm cursor-move select-none';
+      el.draggable = true;
+      el.dataset.id = t.id;
+      el.innerHTML = '<span class="mono font-600 text-gold-light">' + escapeHtml(t.symbol) + '</span>' +
+        '<button class="tk-del text-ink/40 hover:text-danger transition text-base leading-none" title="Hapus">×</button>';
+      el.querySelector('.tk-del').addEventListener('click', () => deleteTicker(t, el));
+      wireTickerDrag(el);
+      return el;
+    }
+
+    $('tickerAddBtn').addEventListener('click', addTicker);
+    $('tickerInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTicker(); } });
+
+    async function addTicker() {
+      const input = $('tickerInput');
+      const symbol = input.value.trim().toUpperCase();
+      if (!/^[A-Z0-9]{2,6}$/.test(symbol)) { showTickerMsg('Kode saham 2-6 huruf/angka.', true); return; }
+      $('tickerAddBtn').disabled = true;
+      try {
+        await api('/api/admin-ticker', 'POST', { symbol });
+        input.value = '';
+        showTickerMsg('Ditambahkan ✓', false);
+        loadTickers();
+      } catch (ex) { showTickerMsg(ex.message, true); }
+      finally { $('tickerAddBtn').disabled = false; }
+    }
+
+    async function deleteTicker(t, el) {
+      if (!window.confirm('Hapus ' + t.symbol + ' dari ticker?')) return;
+      try {
+        await api('/api/admin-ticker', 'DELETE', { id: t.id });
+        el.remove();
+        if (!$('tickerList').children.length) $('tickerListMsg').textContent = 'Belum ada ticker. Tambah kode saham di atas.';
+      } catch (ex) { alert('Gagal hapus: ' + ex.message); }
+    }
+
+    function showTickerMsg(text, isErr) {
+      const m = $('tickerMsg'); m.textContent = text; m.classList.remove('hidden');
+      m.className = 'mt-2 text-xs ' + (isErr ? 'text-danger' : 'text-teal');
+    }
+
+    let tkDragEl = null;
+    function wireTickerDrag(el) {
+      el.addEventListener('dragstart', () => { tkDragEl = el; el.classList.add('dragging'); });
+      el.addEventListener('dragend', async () => { el.classList.remove('dragging'); await persistTickerOrder(); });
+      el.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const wrap = $('tickerList');
+        const after = tkDragAfter(wrap, e.clientX, e.clientY);
+        if (after == null) wrap.appendChild(tkDragEl); else wrap.insertBefore(tkDragEl, after);
+      });
+    }
+    function tkDragAfter(wrap, x, y) {
+      const chips = [...wrap.querySelectorAll('.ticker-chip:not(.dragging)')];
+      let closest = { dist: -Infinity, el: null };
+      for (const c of chips) {
+        const box = c.getBoundingClientRect();
+        // flex-wrap horizontal: prioritas sumbu X, baris pakai bobot kecil.
+        const offset = (x - (box.left + box.width / 2)) + (y - (box.top + box.height / 2)) * 0.001;
+        if (offset < 0 && offset > closest.dist) closest = { dist: offset, el: c };
+      }
+      return closest.el;
+    }
+    async function persistTickerOrder() {
+      const items = [...$('tickerList').querySelectorAll('[data-id]')].map((el, i) => ({ id: el.dataset.id, display_order: i }));
+      try { await api('/api/admin-ticker', 'PATCH', { items }); }
+      catch (ex) { $('tickerListMsg').textContent = 'Gagal simpan urutan: ' + ex.message; }
     }
 
     /* ---------- Logo & Branding ---------- */
