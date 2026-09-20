@@ -130,50 +130,81 @@
     .gallery-item:hover .gallery-img { opacity: 1; transform: translateY(-4px); }
 
     /* ===================== ORBIT (section Fitur) =====================
-       5 menu sinyal ngipas di setengah lingkaran ATAS, hub CTA Discord di
-       bawah-tengah sebagai pusat. Tanpa kotak, jadi canvas partikel nembus.
-       Nggak muter penuh (bikin numpuk); cukup ayunan halus biar tetap hidup
-       tapi teks gampang dibaca. Kartu di-counter-rotate biar selalu tegak. */
-    .orbit-stage { position: relative; width: min(820px, 100%); height: 500px; margin: 0 auto; }
-    .orbit-arc { position: absolute; inset: 0; transform-origin: 50% 78%; animation: orbit-sway 11s ease-in-out infinite; }
-    .orbit-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .slot {
-      position: absolute; left: 50%; top: 78%;
-      --angle: calc(180deg + 45deg * var(--i));   /* 180..360 = setengah lingkaran atas */
-      transform: rotate(var(--angle)) translate(270px);
+       5 menu sinyal ngorbit 360 derajat ngelilingi hub Discord. Jalur rotasi =
+       SATU lingkaran dashed bersih, TANPA garis radial (yang dulu bikin
+       berantakan & nutupin teks). Radius lega + deskripsi ringkas biar kartu
+       nggak saling nutup. Teks di-counter-rotate biar selalu tegak walau muter. */
+    .orbit-stage { position: relative; width: min(660px, 100%); height: 660px; margin: 0 auto; }
+    .orbit-ring-path {
+      position: absolute; left: 50%; top: 50%; width: 500px; height: 500px;   /* diameter = 2 x radius */
+      transform: translate(-50%, -50%); border-radius: 50%;
+      border: 1px dashed rgba(201,162,75,.20);
     }
+    .orbit-ring { position: absolute; inset: 0; animation: orbit-spin 60s linear infinite; }
+    .slot {
+      position: absolute; left: 50%; top: 50%;   /* titik 0,0 slot = pusat stage, lalu didorong ke lingkaran */
+      --angle: calc(-90deg + 72deg * var(--i));
+      transform: rotate(var(--angle)) translate(250px);
+    }
+    /* PENTING: counter-rotate harus muter di TITIK ORBIT (0,0 slot), bukan tengah
+       kartu. Tanpa transform-origin 0 0 kartunya wobble & teks nabrak tetangga. */
+    .counter { position: absolute; left: 0; top: 0; transform-origin: 0 0; animation: orbit-spin-rev 60s linear infinite; }
     .ocard {
       transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle)));
-      width: 180px; text-align: center; cursor: default; transition: transform .25s ease;
+      width: 150px; text-align: center; cursor: default; transition: transform .25s ease;
     }
     .ocard::before {
-      content: ''; position: absolute; left: 50%; top: 50%; width: 200px; height: 200px;
+      content: ''; position: absolute; left: 50%; top: 50%; width: 175px; height: 175px;
       transform: translate(-50%,-50%); z-index: -1; border-radius: 50%;
-      background: radial-gradient(closest-side, rgba(10,14,20,.82), rgba(10,14,20,.32) 55%, transparent 75%);
+      background: radial-gradient(closest-side, rgba(10,14,20,.82), rgba(10,14,20,.3) 55%, transparent 75%);
     }
     .ocard h3, .ocard p { text-shadow: 0 2px 14px rgba(10,14,20,.9); }
     .onode {
-      width: 54px; height: 54px; margin: 0 auto 10px; border-radius: 14px;
+      width: 52px; height: 52px; margin: 0 0 9px; border-radius: 14px;
       display: grid; place-items: center; color: #D4AF6A;
       background: radial-gradient(closest-side, rgba(201,162,75,.14), transparent);
       box-shadow: 0 0 0 1px rgba(201,162,75,.22), 0 0 24px -6px rgba(201,162,75,.5);
       transition: box-shadow .25s ease, transform .25s ease;
     }
+    /* Center icon HANYA di orbit desktop; di list mobile (flex row) biarin rata kiri. */
+    .ocard .onode { margin-left: auto; margin-right: auto; }
     .onum { font-family: var(--font-mono); font-size: 11px; color: rgba(232,230,225,.4); }
-    .orbit-stage:hover .orbit-arc { animation-play-state: paused; }
-    .ocard:hover { transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle))) scale(1.06); }
-    .ocard:hover .onode { box-shadow: 0 0 0 1px rgba(201,162,75,.6), 0 0 34px -4px rgba(201,162,75,.8); transform: scale(1.08); }
+    .orbit-stage:hover .orbit-ring, .orbit-stage:hover .counter { animation-play-state: paused; }
+    .ocard:hover .onode { box-shadow: 0 0 0 1px rgba(201,162,75,.6), 0 0 34px -4px rgba(201,162,75,.8); transform: scale(1.1); }
     .orbit-center {
-      position: absolute; left: 50%; top: 78%; transform: translate(-50%,-50%);
-      width: 240px; text-align: center; z-index: 5;
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: 200px; text-align: center; z-index: 5;
     }
-    @keyframes orbit-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
-    @media (prefers-reduced-motion: reduce) { .orbit-arc { animation: none; } }
+    @keyframes orbit-spin     { to { transform: rotate(360deg); } }
+    @keyframes orbit-spin-rev { to { transform: rotate(-360deg); } }
+    @media (prefers-reduced-motion: reduce) { .orbit-ring, .counter { animation: none; } }
     .orbit-list { display: none; }
     @media (max-width: 1023px) {
       .orbit-stage { display: none; }
       .orbit-list { display: block; }
     }
+
+    /* ===================== ANIMATED ICON (section Masalah) =====================
+       Icon badge gold dengan animasi halus per kartu, plus hover lift. */
+    .pain-ico {
+      position: relative; width: 3rem; height: 3rem; border-radius: .9rem;
+      display: grid; place-items: center; color: #D4AF6A;
+      background: radial-gradient(closest-side, rgba(201,162,75,.15), transparent);
+      box-shadow: 0 0 0 1px rgba(201,162,75,.25);
+    }
+    .pain-ico svg { transform-origin: center; animation-duration: 2.6s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+    .ico-beat   { animation-name: ico-beat; animation-duration: 1.9s !important; }
+    .ico-wiggle { animation-name: ico-wiggle; }
+    .ico-pulse  { animation-name: ico-pulse; }
+    .ico-float  { animation-name: ico-float; }
+    @keyframes ico-beat   { 0%,100% { transform: scale(1); } 12% { transform: scale(1.22); } 24% { transform: scale(1); } 36% { transform: scale(1.12); } 50% { transform: scale(1); } }
+    @keyframes ico-wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+    @keyframes ico-pulse  { 0%,100% { opacity: .7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+    @keyframes ico-float  { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .pain-card { transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
+    .pain-card:hover { transform: translateY(-4px); border-color: rgba(201,162,75,.4); box-shadow: 0 14px 40px -18px rgba(201,162,75,.4); }
+    .pain-card:hover .pain-ico { box-shadow: 0 0 0 1px rgba(201,162,75,.5), 0 0 26px -6px rgba(201,162,75,.8); }
+    @media (prefers-reduced-motion: reduce) { .pain-ico svg { animation: none !important; } }
 
     /* ===================== RUNNING TICKER (header) =====================
        Bar tipis di paling atas, harga saham jalan kiri. Muncul cuma kalau ada
@@ -350,34 +381,34 @@
       </div>
 
       <div class="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <!-- Pain 1 -->
-        <div class="card rounded-2xl p-6 reveal">
-          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 5-7"/></svg>
+        <!-- Pain 1: heartbeat (emosional) -->
+        <div class="pain-card card rounded-2xl p-6 reveal">
+          <div class="pain-ico mb-4">
+            <svg class="w-6 h-6 ico-beat" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M20.8 6.6a4.6 4.6 0 00-6.5 0L12 8.9l-2.3-2.3a4.6 4.6 0 10-6.5 6.5L12 22l8.8-8.9a4.6 4.6 0 000-6.5z"/></svg>
           </div>
           <h3 class="font-display font-600 text-base">Keputusan emosional</h3>
           <p class="mt-2 text-sm text-ink/60 leading-relaxed">Beli pas euforia, jual pas takut. Pola klasik yang menggerus modal tanpa kamu sadari.</p>
         </div>
-        <!-- Pain 2 -->
-        <div class="card rounded-2xl p-6 reveal">
-          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M11 4a7 7 0 100 14 7 7 0 000-14z"/><path d="M21 21l-4.3-4.3"/></svg>
+        <!-- Pain 2: wiggle (nyari-nyari di noise) -->
+        <div class="pain-card card rounded-2xl p-6 reveal">
+          <div class="pain-ico mb-4">
+            <svg class="w-6 h-6 ico-wiggle" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           </div>
           <h3 class="font-display font-600 text-base">Overload informasi</h3>
           <p class="mt-2 text-sm text-ink/60 leading-relaxed">Ratusan sumber, nol filter. Sinyal penting tenggelam di lautan noise dan clickbait.</p>
         </div>
-        <!-- Pain 3 -->
-        <div class="card rounded-2xl p-6 reveal">
-          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 2l9 4.5v5c0 5-3.8 9-9 10.5C6.8 20.5 3 16.5 3 11.5v-5L12 2z"/><path d="M9 12l2 2 4-4"/></svg>
+        <!-- Pain 3: pulse (perisai sistem) -->
+        <div class="pain-card card rounded-2xl p-6 reveal">
+          <div class="pain-ico mb-4">
+            <svg class="w-6 h-6 ico-pulse" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 2l9 4.5v5c0 5-3.8 9-9 10.5C6.8 20.5 3 16.5 3 11.5v-5L12 2z"/><path d="M9 12l2 2 4-4"/></svg>
           </div>
           <h3 class="font-display font-600 text-base">Nggak punya sistem</h3>
           <p class="mt-2 text-sm text-ink/60 leading-relaxed">Tanpa area entry, TP, dan SL yang jelas, tiap posisi jadi taruhan, bukan trading.</p>
         </div>
-        <!-- Pain 4 -->
-        <div class="card rounded-2xl p-6 reveal">
-          <div class="w-11 h-11 rounded-xl bg-navy-base grid place-items-center text-gold mb-4">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.9"/></svg>
+        <!-- Pain 4: float (sendirian) -->
+        <div class="pain-card card rounded-2xl p-6 reveal">
+          <div class="pain-ico mb-4">
+            <svg class="w-6 h-6 ico-float" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.9"/></svg>
           </div>
           <h3 class="font-display font-600 text-base">Sendirian saat ragu</h3>
           <p class="mt-2 text-sm text-ink/60 leading-relaxed">Momen krusial datang, dan nggak ada yang bisa diajak diskusi cepat sebelum eksekusi.</p>
@@ -402,61 +433,56 @@
         </p>
       </div>
 
-      <!-- ============ ORBIT (desktop) ============ -->
-      <div class="orbit-stage mt-10 reveal">
+      <!-- ============ ORBIT 360 (desktop) ============ -->
+      <div class="orbit-stage mt-12 reveal">
+        <!-- Jalur rotasi: satu lingkaran dashed bersih (statis, nggak nutupin teks) -->
+        <div class="orbit-ring-path"></div>
+
         <!-- Pusat: hub Discord (statis, selalu bisa diklik) -->
         <div class="orbit-center">
           <h3 class="font-display font-700 text-lg text-gold-light">Semua menu, satu Discord.</h3>
-          <p class="mt-2 text-sm text-ink/70 leading-relaxed">Nggak perlu loncat grup. Satu tempat, semua sinyal, plus tim yang bisa ditanya.</p>
+          <p class="mt-2 text-sm text-ink/70 leading-relaxed">Satu tempat, semua sinyal, plus tim yang bisa ditanya.</p>
           <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
              class="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-sm font-600 text-navy-base hover:bg-gold-light transition glow-gold">
             Masuk sekarang
           </a>
         </div>
 
-        <!-- Fan setengah lingkaran (bawa kartu + garis korelasi), ayun halus -->
-        <div class="orbit-arc">
-          <svg class="orbit-lines" viewBox="0 0 820 500" fill="none" stroke="rgba(201,162,75,.22)" stroke-width="1" aria-hidden="true">
-            <line x1="410" y1="390" x2="140"   y2="390" />
-            <line x1="410" y1="390" x2="219.1" y2="199.1" />
-            <line x1="410" y1="390" x2="410"   y2="120" />
-            <line x1="410" y1="390" x2="600.9" y2="199.1" />
-            <line x1="410" y1="390" x2="680"   y2="390" />
-          </svg>
-
+        <!-- Ring 360 (bawa kartu, muter pelan) -->
+        <div class="orbit-ring">
           <div class="slot" style="--i:0"><div class="counter"><div class="ocard">
             <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 15l4-6 4 3 4-8 6 5"/><path d="M3 20h18"/></svg></div>
             <span class="onum">01</span>
-            <h3 class="mt-1 font-display font-600 text-base">Swing Trading</h3>
-            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Posisi beberapa hari sampai minggu. Cocok buat yang nggak bisa pantau layar seharian.</p>
+            <h3 class="mt-1 font-display font-600 text-sm">Swing Trading</h3>
+            <p class="mt-1 text-xs text-ink/55 leading-snug">Posisi harian sampai mingguan.</p>
           </div></div></div>
 
           <div class="slot" style="--i:1"><div class="counter"><div class="ocard">
             <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
             <span class="onum">02</span>
-            <h3 class="mt-1 font-display font-600 text-base">Valid Buy</h3>
-            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Momen entry yang sudah lolos filter teknikal analyst. <a href="#bukti" class="text-gold-light underline underline-offset-2 hover:text-gold">lihat buktinya</a>.</p>
+            <h3 class="mt-1 font-display font-600 text-sm">Valid Buy</h3>
+            <p class="mt-1 text-xs text-ink/55 leading-snug">Entry lolos filter teknikal analyst.</p>
           </div></div></div>
 
           <div class="slot" style="--i:2"><div class="counter"><div class="ocard">
             <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
             <span class="onum">03</span>
-            <h3 class="mt-1 font-display font-600 text-base">Day Trade</h3>
-            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Buka-tutup posisi di hari yang sama. Sinyal masuk pas jam bursa, langsung actionable.</p>
+            <h3 class="mt-1 font-display font-600 text-sm">Day Trade</h3>
+            <p class="mt-1 text-xs text-ink/55 leading-snug">Buka-tutup di hari yang sama.</p>
           </div></div></div>
 
           <div class="slot" style="--i:3"><div class="counter"><div class="ocard">
             <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg></div>
             <span class="onum">04</span>
-            <h3 class="mt-1 font-display font-600 text-base">Live / Scalping</h3>
-            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Arahan cepat lewat voice channel saat market bergerak. Buat yang main tipis-tipis rapat.</p>
+            <h3 class="mt-1 font-display font-600 text-sm">Live / Scalping</h3>
+            <p class="mt-1 text-xs text-ink/55 leading-snug">Arahan cepat via voice channel.</p>
           </div></div></div>
 
           <div class="slot" style="--i:4"><div class="counter"><div class="ocard">
             <div class="onode"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0"/><path d="M12 2v7M12 9l3-3M12 9L9 6"/><path d="M3 18h18"/></svg></div>
             <span class="onum">05</span>
-            <h3 class="mt-1 font-display font-600 text-base">BSJP</h3>
-            <p class="mt-1 text-xs text-ink/60 leading-relaxed">Beli Sore Jual Pagi. Strategi overnight yang manfaatin gap pagi.</p>
+            <h3 class="mt-1 font-display font-600 text-sm">BSJP</h3>
+            <p class="mt-1 text-xs text-ink/55 leading-snug">Beli Sore Jual Pagi, main gap.</p>
           </div></div></div>
         </div>
       </div>
