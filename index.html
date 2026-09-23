@@ -232,7 +232,6 @@
       .track-table col:nth-child(1) { width: 38% !important; }
       .track-table col:nth-child(2) { width: 36% !important; }
       .track-table col:nth-child(3) { width: 26% !important; }
-      .track-table col:nth-child(4), .track-table th:nth-child(4), .track-table td:nth-child(4) { display: none; }
     }
     .portfolio-plot { height: 156px; }
     .portfolio-plot svg { width: 100%; height: 156px; overflow: visible; }
@@ -1308,13 +1307,13 @@
     }
 
     function journalTableHeader() {
-      return '<thead><tr class="text-left"><th class="px-5 py-4">Saham</th><th class="px-3 py-4">Gaya</th><th class="px-3 py-4 text-right">Hasil</th><th class="px-5 py-4">Keterangan</th></tr></thead>';
+      return '<thead><tr class="text-left"><th class="px-5 py-4">Saham</th><th class="px-3 py-4">Gaya</th><th class="px-5 py-4 text-right">Hasil</th></tr></thead>';
     }
 
     function journalRow(s) {
       const hasPnl = s.pnl_pct !== null && s.pnl_pct !== undefined;
       const pnlTone = !hasPnl ? 'text-ink/45' : (Number(s.pnl_pct) >= 0 ? 'text-teal' : 'text-red-400');
-      return '<tr><td class="px-5 py-3 font-display font-600">' + escapeText(s.symbol) + '<span class="block mt-0.5 text-[10px] font-body font-400 text-ink/40">' + shortDate(s.recommendation_date) + '</span></td><td class="px-3 py-3 text-ink/60">' + escapeText(s.setup_type) + '</td><td class="px-3 py-3 text-right font-mono ' + pnlTone + '">' + (hasPnl ? pct(s.pnl_pct) : '—') + '</td><td class="px-5 py-3 text-xs leading-relaxed text-ink/50">' + escapeText(s.note || '—') + '</td></tr>';
+      return '<tr><td class="px-5 py-3 font-display font-600">' + escapeText(s.symbol) + '<span class="block mt-0.5 text-[10px] font-body font-400 text-ink/40">' + shortDate(s.recommendation_date) + '</span></td><td class="px-3 py-3 text-ink/60">' + escapeText(s.setup_type) + '</td><td class="px-5 py-3 text-right font-mono ' + pnlTone + '">' + (hasPnl ? pct(s.pnl_pct) : '—') + '</td></tr>';
     }
 
     function renderJournal() {
@@ -1342,7 +1341,7 @@
         if (!signals.length) return '<section class="card rounded-2xl p-5 sm:p-6"><div class="flex items-center justify-between gap-3"><h4 class="font-display font-600 text-lg">' + category.label + '</h4><span class="font-mono text-[10px] tracking-[.1em] text-ink/40">0 SINYAL</span></div><p class="mt-4 text-sm text-ink/45">Belum ada sinyal pada kategori ini di periode terpilih.</p></section>';
         const preview = signals.slice(0, PREVIEW_ROWS).map(journalRow).join('');
         const extra = signals.length - PREVIEW_ROWS;
-        return '<section class="card rounded-2xl overflow-hidden"><div class="flex items-center justify-between gap-3 px-5 py-5 sm:px-6"><div><h4 class="font-display font-600 text-lg">' + category.label + '</h4><p class="mt-1 text-xs text-ink/45">Sinyal periode terpilih, urut rekomendasi terbaru.</p></div><span class="font-mono text-[10px] tracking-[.1em] text-gold-light">' + signals.length + ' SINYAL</span></div><div><table class="track-table w-full table-fixed text-sm"><colgroup><col class="w-[24%]"><col class="w-[24%]"><col class="w-[18%]"><col class="w-[34%]"></colgroup>' + journalTableHeader() + '<tbody id="journalRows-' + category.key + '">' + preview + '</tbody></table></div>' + (extra > 0 ? '<div class="flex items-center justify-between gap-3 flex-wrap border-t border-navy-line px-5 py-3 sm:px-6"><p id="journalCount-' + category.key + '" class="text-xs text-ink/45">Menampilkan ' + PREVIEW_ROWS + ' dari ' + signals.length + ' sinyal.</p><button data-journal-toggle="' + category.key + '" type="button" class="rounded-lg border border-gold/35 px-3 py-2 text-xs font-600 text-gold-light transition hover:border-gold hover:bg-gold/10" aria-expanded="false">Lihat ' + extra + ' sinyal lainnya</button></div>' : '') + '</section>';
+        return '<section class="card rounded-2xl overflow-hidden"><div class="flex items-center justify-between gap-3 px-5 py-5 sm:px-6"><div><h4 class="font-display font-600 text-lg">' + category.label + '</h4><p class="mt-1 text-xs text-ink/45">Sinyal periode terpilih, urut rekomendasi terbaru.</p></div><span class="font-mono text-[10px] tracking-[.1em] text-gold-light">' + signals.length + ' SINYAL</span></div><div><table class="track-table w-full table-fixed text-sm"><colgroup><col class="w-[34%]"><col class="w-[36%]"><col class="w-[30%]"></colgroup>' + journalTableHeader() + '<tbody id="journalRows-' + category.key + '">' + preview + '</tbody></table></div>' + (extra > 0 ? '<div class="flex items-center justify-between gap-3 flex-wrap border-t border-navy-line px-5 py-3 sm:px-6"><p id="journalCount-' + category.key + '" class="text-xs text-ink/45">Menampilkan ' + PREVIEW_ROWS + ' dari ' + signals.length + ' sinyal.</p><button data-journal-toggle="' + category.key + '" type="button" class="rounded-lg border border-gold/35 px-3 py-2 text-xs font-600 text-gold-light transition hover:border-gold hover:bg-gold/10" aria-expanded="false">Lihat ' + extra + ' sinyal lainnya</button></div>' : '') + '</section>';
       }).join('');
       journalCategories.forEach(category => {
         const signals = grouped.get(category.key); const toggle = groups.querySelector('[data-journal-toggle="' + category.key + '"]');
