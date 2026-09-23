@@ -224,8 +224,9 @@
     }
 
     .track-chart { min-height: 230px; }
-    .track-chart svg { width: 100%; height: 210px; overflow: visible; }
+    .track-chart svg { width: 100%; height: 250px; overflow: visible; }
     .track-periods { scrollbar-width: thin; }
+    @media (max-width: 639px) { .track-period-svg { display: none; } }
     .track-legend i { width: .65rem; height: .65rem; border-radius: 999px; display: inline-block; }
     .track-table th { font-family: var(--font-mono); font-size: 10px; letter-spacing: .11em; color: rgba(232,230,225,.42); font-weight: 600; text-transform: uppercase; }
     .track-table td { border-top: 1px solid rgba(30,40,54,.85); }
@@ -580,7 +581,7 @@
         <div class="mt-6 card rounded-2xl p-5 sm:p-7 reveal">
           <div class="flex items-start justify-between gap-4 flex-wrap"><div><p id="trackChartTitle" class="font-mono text-[11px] tracking-[.12em] uppercase text-ink/45">Perbandingan mingguan</p><p id="trackChartNote" class="mt-1 text-xs text-ink/45"></p></div><div class="track-legend flex items-center gap-4 text-xs text-ink/60"><span class="inline-flex items-center gap-2"><i class="bg-gold-light"></i>TII</span><span class="inline-flex items-center gap-2"><i class="bg-teal"></i>IHSG</span></div></div>
           <div id="trackChart" class="track-chart mt-5"></div>
-          <div id="trackPeriodReturns" class="track-periods mt-5 flex gap-2 overflow-x-auto pb-1"></div>
+          <div id="trackPeriodReturns" class="track-periods mt-5 flex gap-2 overflow-x-auto pb-1 sm:hidden"></div>
         </div>
         <div class="mt-8 flex items-center justify-between gap-4 flex-wrap reveal"><div><p class="font-display font-600 text-xl">Signal journal</p><p id="journalPeriod" class="mt-1 text-xs text-ink/45"></p></div><div id="journalWeeks" class="flex flex-wrap gap-2"></div></div>
         <div id="journalGroups" class="mt-4 grid gap-5 reveal"></div>
@@ -1173,11 +1174,15 @@
       });
       const values = points.flatMap(p => [p.tii, p.ihsg]);
       const min = Math.min(...values, 100) - 1; const max = Math.max(...values, 100) + 1;
-      const width = 720, height = 210, pad = { x: 18, top: 12, bottom: 32 };
+      const width = 720, height = 250, pad = { x: 18, top: 12, bottom: 68 };
       const x = i => pad.x + (points.length === 1 ? (width - pad.x * 2) / 2 : i * (width - pad.x * 2) / (points.length - 1));
       const y = value => pad.top + (max - value) * (height - pad.top - pad.bottom) / (max - min || 1);
       const path = key => points.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p[key]).toFixed(1)).join(' ');
-      const labels = points.map((p, i) => '<text x="' + x(i).toFixed(1) + '" y="' + (height - 6) + '" text-anchor="middle" fill="rgba(232,230,225,.38)" font-size="10">' + p.label + '</text>').join('');
+      const labels = points.map((p, i) => {
+        const labelX = x(i).toFixed(1);
+        const record = valid[i];
+        return '<g class="track-period-svg"><text x="' + labelX + '" y="' + (height - 42) + '" text-anchor="middle" fill="rgba(232,230,225,.42)" font-size="10">' + p.label + '</text><text x="' + labelX + '" y="' + (height - 25) + '" text-anchor="middle" fill="#D4AF6A" font-size="9" font-weight="600">T ' + pct(record.tii_return_pct) + '</text><text x="' + labelX + '" y="' + (height - 10) + '" text-anchor="middle" fill="#2E7D6B" font-size="9" font-weight="600">I ' + pct(record.ihsg_return_pct) + '</text></g>';
+      }).join('');
       const last = points[points.length - 1];
       chart.innerHTML = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Akumulasi hasil TII dan IHSG"><line x1="18" y1="' + y(100).toFixed(1) + '" x2="702" y2="' + y(100).toFixed(1) + '" stroke="rgba(232,230,225,.12)" stroke-dasharray="4 4"/><path d="' + path('ihsg') + '" fill="none" stroke="#2E7D6B" stroke-width="2"/><path d="' + path('tii') + '" fill="none" stroke="#D4AF6A" stroke-width="2.5"/>' + labels + '<circle cx="' + x(points.length - 1).toFixed(1) + '" cy="' + y(last.tii).toFixed(1) + '" r="4" fill="#D4AF6A"/></svg>';
       periods.innerHTML = valid.map(record => '<div class="shrink-0 rounded-lg border border-navy-line bg-navy-base/45 px-3 py-2.5"><p class="font-mono text-[9px] uppercase tracking-[.1em] text-ink/40">' + shortDate(record.week_start) + '</p><div class="mt-1.5 flex items-center gap-3 text-xs"><span class="font-mono text-gold-light">TII ' + pct(record.tii_return_pct) + '</span><span class="font-mono text-teal">IHSG ' + pct(record.ihsg_return_pct) + '</span></div></div>').join('');
