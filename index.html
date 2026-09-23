@@ -116,7 +116,7 @@
     /* Canvas partikel full-page: fixed di belakang seluruh konten. */
     #marketPulse { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
     #pageVeil { position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: linear-gradient(180deg, rgba(10,14,20,.42) 0%, rgba(10,14,20,.62) 55%, rgba(10,14,20,.78) 100%); }
+      background: linear-gradient(180deg, rgba(10,14,20,.30) 0%, rgba(10,14,20,.50) 55%, rgba(10,14,20,.66) 100%); }
 
     /* Galeri berjalan (marquee), gerak pelan kiri ke kanan, tepi memudar. */
     @keyframes marqueeRight { from { transform: translate3d(-50%,0,0); } to { transform: translate3d(0,0,0); } }
@@ -225,6 +225,7 @@
 
     .track-chart { min-height: 230px; }
     .track-chart svg { width: 100%; height: 210px; overflow: visible; }
+    .track-periods { scrollbar-width: thin; }
     .track-legend i { width: .65rem; height: .65rem; border-radius: 999px; display: inline-block; }
     .track-table th { font-family: var(--font-mono); font-size: 10px; letter-spacing: .11em; color: rgba(232,230,225,.42); font-weight: 600; text-transform: uppercase; }
     .track-table td { border-top: 1px solid rgba(30,40,54,.85); }
@@ -579,6 +580,7 @@
         <div class="mt-6 card rounded-2xl p-5 sm:p-7 reveal">
           <div class="flex items-start justify-between gap-4 flex-wrap"><div><p id="trackChartTitle" class="font-mono text-[11px] tracking-[.12em] uppercase text-ink/45">Perbandingan mingguan</p><p id="trackChartNote" class="mt-1 text-xs text-ink/45"></p></div><div class="track-legend flex items-center gap-4 text-xs text-ink/60"><span class="inline-flex items-center gap-2"><i class="bg-gold-light"></i>TII</span><span class="inline-flex items-center gap-2"><i class="bg-teal"></i>IHSG</span></div></div>
           <div id="trackChart" class="track-chart mt-5"></div>
+          <div id="trackPeriodReturns" class="track-periods mt-5 flex gap-2 overflow-x-auto pb-1"></div>
         </div>
         <div class="mt-8 flex items-center justify-between gap-4 flex-wrap reveal"><div><p class="font-display font-600 text-xl">Signal journal</p><p id="journalPeriod" class="mt-1 text-xs text-ink/45"></p></div><div id="journalWeeks" class="flex flex-wrap gap-2"></div></div>
         <div id="journalGroups" class="mt-4 grid gap-5 reveal"></div>
@@ -1161,7 +1163,8 @@
     function renderTrackChart(records) {
       const chart = document.getElementById('trackChart');
       const valid = records.slice().reverse().filter(r => r.tii_return_pct !== null || r.ihsg_return_pct !== null);
-      if (!valid.length) { chart.innerHTML = '<p class="text-sm text-ink/45 py-14 text-center">Belum ada hasil sinyal yang selesai untuk diplot.</p>'; return; }
+      const periods = document.getElementById('trackPeriodReturns');
+      if (!valid.length) { chart.innerHTML = '<p class="text-sm text-ink/45 py-14 text-center">Belum ada hasil sinyal yang selesai untuk diplot.</p>'; periods.innerHTML = ''; return; }
       let tii = 100; let ihsg = 100;
       const points = valid.map((r) => {
         if (r.tii_return_pct !== null) tii *= 1 + Number(r.tii_return_pct) / 100;
@@ -1177,11 +1180,21 @@
       const labels = points.map((p, i) => '<text x="' + x(i).toFixed(1) + '" y="' + (height - 6) + '" text-anchor="middle" fill="rgba(232,230,225,.38)" font-size="10">' + p.label + '</text>').join('');
       const last = points[points.length - 1];
       chart.innerHTML = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Akumulasi hasil TII dan IHSG"><line x1="18" y1="' + y(100).toFixed(1) + '" x2="702" y2="' + y(100).toFixed(1) + '" stroke="rgba(232,230,225,.12)" stroke-dasharray="4 4"/><path d="' + path('ihsg') + '" fill="none" stroke="#2E7D6B" stroke-width="2"/><path d="' + path('tii') + '" fill="none" stroke="#D4AF6A" stroke-width="2.5"/>' + labels + '<circle cx="' + x(points.length - 1).toFixed(1) + '" cy="' + y(last.tii).toFixed(1) + '" r="4" fill="#D4AF6A"/></svg>';
+      periods.innerHTML = valid.map(record => '<div class="shrink-0 rounded-lg border border-navy-line bg-navy-base/45 px-3 py-2.5"><p class="font-mono text-[9px] uppercase tracking-[.1em] text-ink/40">' + shortDate(record.week_start) + '</p><div class="mt-1.5 flex items-center gap-3 text-xs"><span class="font-mono text-gold-light">TII ' + pct(record.tii_return_pct) + '</span><span class="font-mono text-teal">IHSG ' + pct(record.ihsg_return_pct) + '</span></div></div>').join('');
     }
 
     function journalCategory(setupType) {
       const normalized = String(setupType || '').toUpperCase().replace(/[^A-Z]/g, '');
       return journalCategories.find(category => category.match.includes(normalized)) || null;
+    }
+
+    // Nilai 0% atau -100% pada CSV lama terbentuk ketika sel harga kosong
+    // terbaca sebagai angka 0. Jangan jadikan angka anomali itu bukti performa.
+    function isDisplayableSignal(signal) {
+      if (signal.status === 'PENDING') return false;
+      if (signal.pnl_pct === null || signal.pnl_pct === undefined) return true;
+      const pnl = Number(signal.pnl_pct);
+      return Number.isFinite(pnl) && Math.abs(pnl) > 0.005 && pnl > -99.995;
     }
 
     function journalTableHeader() {
@@ -1191,7 +1204,9 @@
     function journalRow(s) {
       const entry = s.entry_low !== null && s.entry_high !== null && Number(s.entry_low) !== Number(s.entry_high) ? rupiah(s.entry_low) + '–' + rupiah(s.entry_high) : rupiah(s.entry_price);
       const state = String(s.status || 'OPEN').toLowerCase();
-      return '<tr><td class="px-5 py-3 font-display font-600">' + escapeText(s.symbol) + '<span class="block mt-0.5 text-[10px] font-body font-400 text-ink/40">' + shortDate(s.recommendation_date) + '</span></td><td class="px-3 py-3 text-ink/60">' + escapeText(s.setup_type) + '</td><td class="px-3 py-3 text-right font-mono text-ink/75">' + entry + '</td><td class="px-3 py-3 text-right font-mono text-gold-light">' + (s.target_price === null ? '–' : rupiah(s.target_price)) + '</td><td class="px-3 py-3 text-right font-mono text-ink/55">' + (s.stop_loss_price === null ? '–' : rupiah(s.stop_loss_price)) + '</td><td class="px-3 py-3 text-right font-mono ' + (Number(s.pnl_pct) >= 0 ? 'text-teal' : 'text-red-400') + '">' + pct(s.pnl_pct) + '</td><td class="px-5 py-3 text-right"><span class="signal-status ' + state + '">' + escapeText(s.status) + '</span></td></tr>';
+      const hasPnl = s.pnl_pct !== null && s.pnl_pct !== undefined;
+      const pnlTone = !hasPnl ? 'text-ink/45' : (Number(s.pnl_pct) >= 0 ? 'text-teal' : 'text-red-400');
+      return '<tr><td class="px-5 py-3 font-display font-600">' + escapeText(s.symbol) + '<span class="block mt-0.5 text-[10px] font-body font-400 text-ink/40">' + shortDate(s.recommendation_date) + '</span></td><td class="px-3 py-3 text-ink/60">' + escapeText(s.setup_type) + '</td><td class="px-3 py-3 text-right font-mono text-ink/75">' + entry + '</td><td class="px-3 py-3 text-right font-mono text-gold-light">' + (s.target_price === null ? '–' : rupiah(s.target_price)) + '</td><td class="px-3 py-3 text-right font-mono text-ink/55">' + (s.stop_loss_price === null ? '–' : rupiah(s.stop_loss_price)) + '</td><td class="px-3 py-3 text-right font-mono ' + pnlTone + '">' + pct(s.pnl_pct) + '</td><td class="px-5 py-3 text-right"><span class="signal-status ' + state + '">' + escapeText(s.status) + '</span></td></tr>';
     }
 
     async function renderJournalWeek(weekStart) {
@@ -1208,7 +1223,7 @@
       const groups = document.getElementById('journalGroups');
       if (error || !data || !data.length) { groups.innerHTML = '<div class="card rounded-2xl px-5 py-8 text-center text-ink/45">Belum ada sinyal yang dapat ditampilkan.</div>'; return; }
       const grouped = new Map(journalCategories.map(category => [category.key, []]));
-      data.filter(signal => signal.status !== 'PENDING').forEach(signal => {
+      data.filter(isDisplayableSignal).forEach(signal => {
         const category = journalCategory(signal.setup_type);
         if (category) grouped.get(category.key).push(signal);
       });
@@ -1236,7 +1251,7 @@
 
     function simulatePortfolio(signals) {
       const CAPITAL = 5000000, MAX_POSITIONS = 3, FEE_RT = 0.004;
-      const usable = signals.filter(s => s.recommendation_date && s.done_date && s.pnl_pct !== null && s.pnl_pct !== undefined)
+      const usable = signals.filter(s => isDisplayableSignal(s) && s.recommendation_date && s.done_date && s.pnl_pct !== null && s.pnl_pct !== undefined)
         .map(s => ({ ...s, entryDate: s.recommendation_date, exitDate: s.done_date, pnl: Number(s.pnl_pct) }))
         .filter(s => Number.isFinite(s.pnl) && s.exitDate >= s.entryDate)
         .sort((a, b) => a.entryDate.localeCompare(b.entryDate) || a.exitDate.localeCompare(b.exitDate));
@@ -1367,8 +1382,8 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d', { alpha: true });
 
-      const GOLD = '212, 175, 106';   // #D4AF6A
-      const TEAL = '46, 125, 107';    // #2E7D6B, sentimen "netral", minoritas
+      const GOLD = '222, 188, 111';   // gold lebih terang, tetap hangat
+      const TEAL = '58, 174, 148';    // teal lebih terbaca di atas navy
       let W = 0, H = 0, DPR = 1;
       let nodes = [];
       let linkDist = 130;             // radius koneksi antar node
@@ -1467,11 +1482,11 @@
             const dist = Math.hypot(dx, dy);
             if (dist > linkDist) continue;
             const t = 1 - dist / linkDist;              // 0..1, 1 = sangat dekat
-            let alpha = 0.08 + t * 0.07;                // ~0.08–0.15
+            let alpha = 0.11 + t * 0.12;                // ~0.11–0.23
             const boost = Math.max(a.pulse, b.pulse);    // spike memperkuat garis
-            alpha += boost * 0.25;
+            alpha += boost * 0.28;
             ctx.strokeStyle = 'rgba(' + GOLD + ',' + alpha.toFixed(3) + ')';
-            ctx.lineWidth = 0.6 + boost * 0.8;
+            ctx.lineWidth = 0.75 + boost * 0.9;
             ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
           }
         }
@@ -1495,11 +1510,12 @@
           const glow = 0.55 + spike * 0.45;
           if (spike > 0.05) {
             ctx.shadowColor = 'rgba(' + n.color + ',' + glow.toFixed(2) + ')';
-            ctx.shadowBlur = 8 + spike * 12;
+            ctx.shadowBlur = 10 + spike * 14;
           } else {
-            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'rgba(' + n.color + ',.45)';
+            ctx.shadowBlur = 3;
           }
-          ctx.fillStyle = 'rgba(' + n.color + ',' + (0.65 + spike * 0.35).toFixed(2) + ')';
+          ctx.fillStyle = 'rgba(' + n.color + ',' + (0.78 + spike * 0.22).toFixed(2) + ')';
           ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill();
         }
         ctx.shadowBlur = 0;

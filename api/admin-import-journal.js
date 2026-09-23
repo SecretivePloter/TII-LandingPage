@@ -37,8 +37,11 @@ function parseDate(value) {
 
 function parseNumber(value) {
   const cleaned = String(value || '').replace(/Rp|\./gi, '').replace(',', '.').replace(/[^0-9.-]/g, '');
+  // Sel kosong bukan harga Rp0. Ini krusial untuk HARGA EXIT REAL pada
+  // sinyal OPEN: jika dibaca 0, P/L akan keliru menjadi -100%.
+  if (!cleaned || cleaned === '-' || cleaned === '.') return null;
   const n = Number(cleaned);
-  return Number.isFinite(n) ? n : null;
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 function parseRange(value) {
