@@ -118,6 +118,22 @@
         <p id="tickerListMsg" class="mt-2 text-xs text-ink/40">Drag chip untuk atur urutan · × untuk hapus</p>
       </section>
 
+      <!-- Import Google Sheets CSV -->
+      <section class="card rounded-2xl p-6 mb-8">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div class="max-w-2xl">
+            <h2 class="font-semibold">Signal Journal dari Google Sheets</h2>
+            <p class="text-xs text-ink/50 mt-1 leading-relaxed">Export tab rekomendasi sebagai CSV, lalu impor di sini. Data yang cocok: TANGGAL REKOM, NAMA EMITEN, GAYA TRADE, ENTRY 1, AVG REKOM, TARGET, HIGH, SL, STATUS, TANGGAL DONE, dan KETERANGAN. CSV tidak diunggah ke publik, hanya diproses untuk memperbarui jurnal.</p>
+          </div>
+          <label class="shrink-0 rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-navy-base hover:bg-gold-light transition cursor-pointer">
+            Pilih CSV
+            <input id="journalCsvInput" type="file" accept=".csv,text/csv" class="hidden" />
+          </label>
+        </div>
+        <p id="journalImportMsg" class="mt-3 text-xs text-ink/40">Belum ada file yang dipilih.</p>
+        <p class="mt-2 text-[11px] text-ink/35">Perhitungan sementara: status DONE TP memakai target sebagai hasil, DONE SL memakai stop loss. HIGH hanya ditampilkan sebagai konteks, bukan profit aktual.</p>
+      </section>
+
       <!-- Tabs -->
       <div id="tabs" class="flex flex-wrap gap-2 mb-8">
         <button data-tab="testimoni" class="tab rounded-lg px-4 py-2 text-sm card">Testimoni</button>
@@ -321,6 +337,35 @@
       try { await api('/api/admin-ticker', 'PATCH', { items }); }
       catch (ex) { $('tickerListMsg').textContent = 'Gagal simpan urutan: ' + ex.message; }
     }
+
+    /* ---------- Import signal journal dari CSV Google Sheets ---------- */
+    $('journalCsvInput').addEventListener('change', () => {
+      const file = $('journalCsvInput').files[0];
+      if (!file) return;
+      const msg = $('journalImportMsg');
+      if (file.size > 750 * 1024) {
+        msg.textContent = 'CSV lebih dari 750 KB. Pecah per periode dulu.';
+        msg.className = 'mt-3 text-xs text-danger';
+        $('journalCsvInput').value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = async () => {
+        msg.textContent = 'Mengimpor jurnal…'; msg.className = 'mt-3 text-xs text-teal';
+        try {
+          const result = await api('/api/admin-import-journal', 'POST', { csv: String(reader.result || '') });
+          const skipped = result.issues && result.issues.length ? ' ' + result.issues.length + ' baris dilewati.' : '';
+          msg.textContent = result.imported + ' sinyal dari ' + result.weeks + ' minggu berhasil diimpor.' + skipped;
+          msg.className = 'mt-3 text-xs text-teal';
+        } catch (ex) {
+          msg.textContent = 'Import gagal: ' + ex.message;
+          msg.className = 'mt-3 text-xs text-danger';
+        } finally {
+          $('journalCsvInput').value = '';
+        }
+      };
+      reader.readAsText(file);
+    });
 
     /* ---------- Logo & Branding ---------- */
     function loadLogoPreview() {

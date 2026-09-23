@@ -72,6 +72,7 @@
       --font-body:    'Instrument Sans', system-ui, sans-serif;
       --font-mono:    'Spline Sans Mono', ui-monospace, monospace;
     }
+    html, body { overflow-x: hidden; }
     body { font-family: var(--font-body); background-color: #0A0E14; color: #E8E6E1; }
     h1, h2, h3, .font-display { font-family: var(--font-display); }
     .font-mono { font-family: var(--font-mono); }
@@ -222,6 +223,17 @@
       #tickerScroll { overflow-x: auto; }
     }
 
+    .track-chart { min-height: 230px; }
+    .track-chart svg { width: 100%; height: 210px; overflow: visible; }
+    .track-legend i { width: .65rem; height: .65rem; border-radius: 999px; display: inline-block; }
+    .track-table th { font-family: var(--font-mono); font-size: 10px; letter-spacing: .11em; color: rgba(232,230,225,.42); font-weight: 600; text-transform: uppercase; }
+    .track-table td { border-top: 1px solid rgba(30,40,54,.85); }
+    .signal-status { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; }
+    .signal-status.win { color: #54c49f; } .signal-status.loss, .signal-status.stopped { color: #e5674e; }
+    .signal-status.open { color: #d4af6a; } .signal-status.cancelled { color: rgba(232,230,225,.42); }
+    .portfolio-plot { height: 156px; }
+    .portfolio-plot svg { width: 100%; height: 156px; overflow: visible; }
+
     /* Scrollbar hint dalam gold */
     ::selection { background: rgba(201,162,75,.3); }
   </style>
@@ -270,6 +282,7 @@
         <a href="#masalah" class="hover:text-ink transition">Masalah</a>
         <a href="#fitur" class="hover:text-ink transition">Fitur Harian</a>
         <a href="#bukti" class="hover:text-ink transition">Bukti</a>
+        <a href="#track-record" class="hover:text-ink transition">Track Record</a>
         <a href="#harga" class="hover:text-ink transition">Harga</a>
         <a href="#faq" class="hover:text-ink transition">FAQ</a>
       </div>
@@ -290,6 +303,7 @@
       <a href="#masalah" class="block py-1.5 text-ink/80">Masalah</a>
       <a href="#fitur" class="block py-1.5 text-ink/80">Fitur Harian</a>
       <a href="#bukti" class="block py-1.5 text-ink/80">Bukti</a>
+      <a href="#track-record" class="block py-1.5 text-ink/80">Track Record</a>
       <a href="#harga" class="block py-1.5 text-ink/80">Harga</a>
       <a href="#faq" class="block py-1.5 text-ink/80">FAQ</a>
       <a href="https://discord.gg/msJHhqFRCK" target="_blank" rel="noopener"
@@ -547,6 +561,34 @@
            class="inline-flex items-center gap-2.5 rounded-xl border border-gold/40 px-6 py-3.5 font-600 text-gold-light hover:bg-gold hover:text-navy-base transition">
           Gabung dan jadi bukti berikutnya
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ TRACK RECORD ============================ -->
+  <section id="track-record" class="relative z-10 py-24">
+    <div class="max-w-6xl mx-auto px-5">
+      <div class="max-w-3xl">
+        <p class="rule text-sm font-500 text-gold-light reveal">Track record</p>
+        <h2 class="mt-5 font-display font-700 text-3xl sm:text-4xl leading-tight reveal">Semua sinyal yang selesai, <span class="text-gold-light">ikut kami tunjukkan.</span></h2>
+        <p class="mt-4 text-ink/60 leading-relaxed reveal">Bukan hanya screenshot take profit. Jurnal ini memuat sinyal yang masih berjalan, target yang tercapai, dan stop loss yang kena. Pembanding IHSG memakai pergerakan indeks pada minggu yang sama.</p>
+      </div>
+      <div id="trackEmpty" class="hidden mt-12 rounded-2xl border border-dashed border-navy-line bg-navy-card/40 px-6 py-12 text-center text-sm text-ink/45">Track record sedang disiapkan.</div>
+      <div id="trackContent" class="mt-12 hidden">
+        <div id="trackSummary" class="grid sm:grid-cols-3 gap-3 reveal"></div>
+        <div class="mt-6 card rounded-2xl p-5 sm:p-7 reveal">
+          <div class="flex items-start justify-between gap-4 flex-wrap"><div><p id="trackChartTitle" class="font-mono text-[11px] tracking-[.12em] uppercase text-ink/45">Perbandingan mingguan</p><p id="trackChartNote" class="mt-1 text-xs text-ink/45"></p></div><div class="track-legend flex items-center gap-4 text-xs text-ink/60"><span class="inline-flex items-center gap-2"><i class="bg-gold-light"></i>TII</span><span class="inline-flex items-center gap-2"><i class="bg-teal"></i>IHSG</span></div></div>
+          <div id="trackChart" class="track-chart mt-5"></div>
+        </div>
+        <div class="mt-8 flex items-center justify-between gap-4 flex-wrap reveal"><div><p class="font-display font-600 text-xl">Signal journal</p><p id="journalPeriod" class="mt-1 text-xs text-ink/45"></p></div><div id="journalWeeks" class="flex flex-wrap gap-2"></div></div>
+        <div id="journalGroups" class="mt-4 grid gap-5 reveal"></div>
+        <p id="journalMethod" class="mt-3 text-xs text-ink/40 reveal"></p>
+        <div class="mt-12 card rounded-2xl p-5 sm:p-7 reveal">
+          <div class="flex items-start justify-between gap-5 flex-wrap"><div><p class="font-mono text-[11px] tracking-[.12em] uppercase text-gold-light">Studi kasus</p><h3 class="mt-2 font-display font-700 text-2xl">Simulasi portofolio <span class="text-gold-light">Rp5 juta</span></h3><p id="portfolioAssumption" class="mt-2 max-w-2xl text-xs leading-relaxed text-ink/50">Modal dibagi ke maksimal tiga posisi aktif. Hanya sinyal closed yang dihitung.</p></div><span class="rounded-full border border-gold/25 bg-gold/10 px-3 py-1.5 font-mono text-[10px] tracking-[.1em] text-gold-light">FEE 0,40% RT</span></div>
+          <div id="portfolioSummary" class="mt-6 grid sm:grid-cols-4 gap-3"></div>
+          <div id="portfolioPlot" class="portfolio-plot mt-7"></div>
+          <p id="portfolioNote" class="mt-3 text-xs text-ink/40"></p>
+        </div>
       </div>
     </div>
   </section>
@@ -1094,6 +1136,174 @@
     }
 
     loadGalleries();
+
+    /* =====================================================================
+       PUBLIC TRACK RECORD -- data from the private-sheet CSV import
+       ===================================================================== */
+    let trackDb = null;
+    let trackWeeks = [];
+    let activeTrackWeek = null;
+    const journalCategories = [
+      { key: 'live', label: 'Live Trade', match: ['LIVETRADE', 'LIVETRADESCALPING', 'SCALPING'] },
+      { key: 'bsjp', label: 'BSJP', match: ['BSJP'] },
+      { key: 'day', label: 'Day Trade', match: ['DAYTRADE'] },
+      { key: 'swing', label: 'Swing', match: ['SWING', 'SWINGTRADE'] },
+    ];
+    const rupiah = (n) => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 });
+    const pct = (n) => (n === null || n === undefined ? 'Belum tersedia' : (Number(n) > 0 ? '+' : '') + Number(n).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + '%');
+    const shortDate = (iso) => new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short' }).format(new Date(iso + 'T00:00:00Z'));
+
+    function trackCard(label, value, tone, sub) {
+      return '<div class="card rounded-xl p-5"><p class="font-mono text-[10px] tracking-[.12em] uppercase text-ink/40">' + label + '</p>' +
+        '<p class="mt-3 font-display font-700 text-2xl ' + tone + '">' + value + '</p><p class="mt-1 text-xs text-ink/45">' + sub + '</p></div>';
+    }
+
+    function renderTrackChart(records) {
+      const chart = document.getElementById('trackChart');
+      const valid = records.slice().reverse().filter(r => r.tii_return_pct !== null || r.ihsg_return_pct !== null);
+      if (!valid.length) { chart.innerHTML = '<p class="text-sm text-ink/45 py-14 text-center">Belum ada hasil sinyal yang selesai untuk diplot.</p>'; return; }
+      let tii = 100; let ihsg = 100;
+      const points = valid.map((r) => {
+        if (r.tii_return_pct !== null) tii *= 1 + Number(r.tii_return_pct) / 100;
+        if (r.ihsg_return_pct !== null) ihsg *= 1 + Number(r.ihsg_return_pct) / 100;
+        return { label: shortDate(r.week_start), tii, ihsg };
+      });
+      const values = points.flatMap(p => [p.tii, p.ihsg]);
+      const min = Math.min(...values, 100) - 1; const max = Math.max(...values, 100) + 1;
+      const width = 720, height = 210, pad = { x: 18, top: 12, bottom: 32 };
+      const x = i => pad.x + (points.length === 1 ? (width - pad.x * 2) / 2 : i * (width - pad.x * 2) / (points.length - 1));
+      const y = value => pad.top + (max - value) * (height - pad.top - pad.bottom) / (max - min || 1);
+      const path = key => points.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p[key]).toFixed(1)).join(' ');
+      const labels = points.map((p, i) => '<text x="' + x(i).toFixed(1) + '" y="' + (height - 6) + '" text-anchor="middle" fill="rgba(232,230,225,.38)" font-size="10">' + p.label + '</text>').join('');
+      const last = points[points.length - 1];
+      chart.innerHTML = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Akumulasi hasil TII dan IHSG"><line x1="18" y1="' + y(100).toFixed(1) + '" x2="702" y2="' + y(100).toFixed(1) + '" stroke="rgba(232,230,225,.12)" stroke-dasharray="4 4"/><path d="' + path('ihsg') + '" fill="none" stroke="#2E7D6B" stroke-width="2"/><path d="' + path('tii') + '" fill="none" stroke="#D4AF6A" stroke-width="2.5"/>' + labels + '<circle cx="' + x(points.length - 1).toFixed(1) + '" cy="' + y(last.tii).toFixed(1) + '" r="4" fill="#D4AF6A"/></svg>';
+    }
+
+    function journalCategory(setupType) {
+      const normalized = String(setupType || '').toUpperCase().replace(/[^A-Z]/g, '');
+      return journalCategories.find(category => category.match.includes(normalized)) || null;
+    }
+
+    function journalTableHeader() {
+      return '<thead><tr class="text-left"><th class="px-5 py-4">Saham</th><th class="px-3 py-4">Gaya</th><th class="px-3 py-4 text-right">Entry</th><th class="px-3 py-4 text-right">Target</th><th class="px-3 py-4 text-right">SL</th><th class="px-3 py-4 text-right">Hasil</th><th class="px-5 py-4 text-right">Status</th></tr></thead>';
+    }
+
+    function journalRow(s) {
+      const entry = s.entry_low !== null && s.entry_high !== null && Number(s.entry_low) !== Number(s.entry_high) ? rupiah(s.entry_low) + '–' + rupiah(s.entry_high) : rupiah(s.entry_price);
+      const state = String(s.status || 'OPEN').toLowerCase();
+      return '<tr><td class="px-5 py-3 font-display font-600">' + escapeText(s.symbol) + '<span class="block mt-0.5 text-[10px] font-body font-400 text-ink/40">' + shortDate(s.recommendation_date) + '</span></td><td class="px-3 py-3 text-ink/60">' + escapeText(s.setup_type) + '</td><td class="px-3 py-3 text-right font-mono text-ink/75">' + entry + '</td><td class="px-3 py-3 text-right font-mono text-gold-light">' + (s.target_price === null ? '–' : rupiah(s.target_price)) + '</td><td class="px-3 py-3 text-right font-mono text-ink/55">' + (s.stop_loss_price === null ? '–' : rupiah(s.stop_loss_price)) + '</td><td class="px-3 py-3 text-right font-mono ' + (Number(s.pnl_pct) >= 0 ? 'text-teal' : 'text-red-400') + '">' + pct(s.pnl_pct) + '</td><td class="px-5 py-3 text-right"><span class="signal-status ' + state + '">' + escapeText(s.status) + '</span></td></tr>';
+    }
+
+    async function renderJournalWeek(weekStart) {
+      activeTrackWeek = weekStart;
+      document.querySelectorAll('[data-track-week]').forEach(btn => {
+        const selected = btn.dataset.trackWeek === weekStart;
+        btn.classList.toggle('bg-gold', selected); btn.classList.toggle('text-navy-base', selected);
+        btn.classList.toggle('border-gold', selected);
+      });
+      const record = trackWeeks.find(r => r.week_start === weekStart);
+      document.getElementById('journalPeriod').textContent = record ? shortDate(record.week_start) + ' sampai ' + shortDate(record.week_end) : '';
+      document.getElementById('journalMethod').textContent = record ? record.methodology : '';
+      const { data, error } = await trackDb.from('signal_journal').select('*').eq('week_start', weekStart).order('recommendation_date', { ascending: false });
+      const groups = document.getElementById('journalGroups');
+      if (error || !data || !data.length) { groups.innerHTML = '<div class="card rounded-2xl px-5 py-8 text-center text-ink/45">Belum ada sinyal yang dapat ditampilkan.</div>'; return; }
+      const grouped = new Map(journalCategories.map(category => [category.key, []]));
+      data.filter(signal => signal.status !== 'PENDING').forEach(signal => {
+        const category = journalCategory(signal.setup_type);
+        if (category) grouped.get(category.key).push(signal);
+      });
+      const PREVIEW_ROWS = 6;
+      groups.innerHTML = journalCategories.map(category => {
+        const signals = grouped.get(category.key);
+        if (!signals.length) return '<section class="card rounded-2xl p-5 sm:p-6"><div class="flex items-center justify-between gap-3"><h4 class="font-display font-600 text-lg">' + category.label + '</h4><span class="font-mono text-[10px] tracking-[.1em] text-ink/40">0 SINYAL</span></div><p class="mt-4 text-sm text-ink/45">Belum ada sinyal pada kategori ini di minggu terpilih.</p></section>';
+        const preview = signals.slice(0, PREVIEW_ROWS).map(journalRow).join('');
+        const extra = signals.length - PREVIEW_ROWS;
+        return '<section class="card rounded-2xl overflow-hidden"><div class="flex items-center justify-between gap-3 px-5 py-5 sm:px-6"><div><h4 class="font-display font-600 text-lg">' + category.label + '</h4><p class="mt-1 text-xs text-ink/45">Sinyal minggu terpilih, urut rekomendasi terbaru.</p></div><span class="font-mono text-[10px] tracking-[.1em] text-gold-light">' + signals.length + ' SINYAL</span></div><div class="overflow-x-auto"><table class="track-table w-full min-w-[760px] text-sm">' + journalTableHeader() + '<tbody id="journalRows-' + category.key + '">' + preview + '</tbody></table></div>' + (extra > 0 ? '<div class="flex items-center justify-between gap-3 flex-wrap border-t border-navy-line px-5 py-3 sm:px-6"><p id="journalCount-' + category.key + '" class="text-xs text-ink/45">Menampilkan ' + PREVIEW_ROWS + ' dari ' + signals.length + ' sinyal.</p><button data-journal-toggle="' + category.key + '" type="button" class="rounded-lg border border-gold/35 px-3 py-2 text-xs font-600 text-gold-light transition hover:border-gold hover:bg-gold/10" aria-expanded="false">Lihat ' + extra + ' sinyal lainnya</button></div>' : '') + '</section>';
+      }).join('');
+      journalCategories.forEach(category => {
+        const signals = grouped.get(category.key); const toggle = groups.querySelector('[data-journal-toggle="' + category.key + '"]');
+        if (!toggle) return;
+        let expanded = false;
+        toggle.onclick = () => {
+          expanded = !expanded;
+          document.getElementById('journalRows-' + category.key).innerHTML = (expanded ? signals : signals.slice(0, PREVIEW_ROWS)).map(journalRow).join('');
+          document.getElementById('journalCount-' + category.key).textContent = expanded ? 'Menampilkan seluruh ' + signals.length + ' sinyal.' : 'Menampilkan ' + PREVIEW_ROWS + ' dari ' + signals.length + ' sinyal.';
+          toggle.textContent = expanded ? 'Ringkas ke ' + PREVIEW_ROWS + ' sinyal' : 'Lihat ' + (signals.length - PREVIEW_ROWS) + ' sinyal lainnya';
+          toggle.setAttribute('aria-expanded', String(expanded));
+        };
+      });
+    }
+
+    function simulatePortfolio(signals) {
+      const CAPITAL = 5000000, MAX_POSITIONS = 3, FEE_RT = 0.004;
+      const usable = signals.filter(s => s.recommendation_date && s.done_date && s.pnl_pct !== null && s.pnl_pct !== undefined)
+        .map(s => ({ ...s, entryDate: s.recommendation_date, exitDate: s.done_date, pnl: Number(s.pnl_pct) }))
+        .filter(s => Number.isFinite(s.pnl) && s.exitDate >= s.entryDate)
+        .sort((a, b) => a.entryDate.localeCompare(b.entryDate) || a.exitDate.localeCompare(b.exitDate));
+      const dates = [...new Set(usable.flatMap(s => [s.entryDate, s.exitDate]))].sort();
+      let cash = CAPITAL; let positions = []; let processed = 0; let skipped = 0; let fees = 0;
+      const points = [{ date: usable[0]?.entryDate || '', value: cash }];
+      dates.forEach(date => {
+        // Posisi yang sudah selesai direalisasikan sebelum entry baru pada tanggal berikutnya.
+        const closing = positions.filter(p => p.exitDate <= date);
+        positions = positions.filter(p => p.exitDate > date);
+        closing.forEach(p => { const fee = p.amount * FEE_RT; fees += fee; cash += p.amount + (p.amount * p.pnl / 100) - fee; });
+        usable.filter(s => s.entryDate === date).forEach(s => {
+          if (positions.length >= MAX_POSITIONS || cash <= 0) { skipped += 1; return; }
+          const amount = cash / (MAX_POSITIONS - positions.length);
+          cash -= amount; positions.push({ ...s, amount }); processed += 1;
+        });
+        // Day trade yang masuk dan selesai pada tanggal sama ditutup sesudah entry.
+        const sameDay = positions.filter(p => p.exitDate === date);
+        positions = positions.filter(p => p.exitDate !== date);
+        sameDay.forEach(p => { const fee = p.amount * FEE_RT; fees += fee; cash += p.amount + (p.amount * p.pnl / 100) - fee; });
+        if (closing.length || sameDay.length) points.push({ date, value: cash + positions.reduce((sum, p) => sum + p.amount, 0) });
+      });
+      return { capital: CAPITAL, end: cash + positions.reduce((sum, p) => sum + p.amount, 0), processed, skipped, fees, points };
+    }
+
+    function renderPortfolioPlot(points) {
+      const plot = document.getElementById('portfolioPlot');
+      if (points.length < 2) { plot.innerHTML = '<p class="py-12 text-center text-sm text-ink/45">Butuh minimal satu sinyal closed untuk simulasi.</p>'; return; }
+      const width = 720, height = 156, pad = { x: 16, top: 14, bottom: 26 };
+      const values = points.map(p => p.value); const min = Math.min(...values) * .995; const max = Math.max(...values) * 1.005;
+      const x = i => pad.x + i * (width - pad.x * 2) / (points.length - 1);
+      const y = value => pad.top + (max - value) * (height - pad.top - pad.bottom) / (max - min || 1);
+      const path = points.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.value).toFixed(1)).join(' ');
+      plot.innerHTML = '<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Perjalanan nilai simulasi portofolio"><defs><linearGradient id="portfolioFill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#D4AF6A" stop-opacity=".32"/><stop offset="1" stop-color="#D4AF6A" stop-opacity="0"/></linearGradient></defs><line x1="16" y1="' + y(points[0].value).toFixed(1) + '" x2="704" y2="' + y(points[0].value).toFixed(1) + '" stroke="rgba(232,230,225,.12)" stroke-dasharray="4 4"/><path d="' + path + ' L704 ' + (height - pad.bottom) + ' L16 ' + (height - pad.bottom) + ' Z" fill="url(#portfolioFill)"/><path d="' + path + '" fill="none" stroke="#D4AF6A" stroke-width="2.5"/><text x="16" y="' + (height - 6) + '" fill="rgba(232,230,225,.38)" font-size="10">' + shortDate(points[0].date) + '</text><text x="704" y="' + (height - 6) + '" text-anchor="end" fill="rgba(232,230,225,.38)" font-size="10">' + shortDate(points[points.length - 1].date) + '</text></svg>';
+    }
+
+    async function renderPortfolio() {
+      const { data, error } = await trackDb.from('signal_journal').select('*').order('recommendation_date', { ascending: true }).limit(500);
+      if (error) return;
+      const result = simulatePortfolio(data || []); const returnPct = ((result.end - result.capital) / result.capital) * 100;
+      document.getElementById('portfolioSummary').innerHTML = trackCard('Modal awal', 'Rp' + rupiah(result.capital), 'text-ink', 'Total portofolio') + trackCard('Modal akhir', 'Rp' + rupiah(Math.round(result.end)), returnPct >= 0 ? 'text-gold-light' : 'text-red-400', pct(returnPct) + ' setelah fee') + trackCard('Fee broker', 'Rp' + rupiah(Math.round(result.fees)), 'text-ink/80', 'Estimasi 0,40% RT') + trackCard('Sinyal dipakai', result.processed + ' posisi', 'text-ink', result.skipped ? result.skipped + ' dilewati, batas 3 posisi aktif' : 'Maks. 3 posisi aktif');
+      document.getElementById('portfolioNote').textContent = 'Simulasi bersifat ilustrasi dari data jurnal. Entry memakai tanggal rekomendasi, exit memakai tanggal selesai. Posisi OPEN tidak dihitung dan hasil masa lalu bukan jaminan hasil berikutnya.';
+      renderPortfolioPlot(result.points);
+    }
+
+    async function loadTrackRecord() {
+      const empty = document.getElementById('trackEmpty'); const content = document.getElementById('trackContent');
+      try {
+        const response = await fetch('/api/config'); if (!response.ok) throw new Error('config');
+        const cfg = await response.json(); trackDb = window.supabase.createClient(cfg.url, cfg.anonKey);
+        const { data, error } = await trackDb.from('weekly_track_records').select('*').order('week_start', { ascending: false }).limit(12);
+        if (error || !data || !data.length) throw new Error('empty');
+        trackWeeks = data; content.classList.remove('hidden'); empty.classList.add('hidden');
+        const latest = data[0]; const alpha = latest.tii_return_pct !== null && latest.ihsg_return_pct !== null ? Number(latest.tii_return_pct) - Number(latest.ihsg_return_pct) : null;
+        document.getElementById('trackSummary').innerHTML = trackCard('Rata-rata P/L sinyal', pct(latest.tii_return_pct), Number(latest.tii_return_pct) >= 0 ? 'text-gold-light' : 'text-red-400', 'Sinyal closed, minggu ' + shortDate(latest.week_start)) + trackCard('Pergerakan IHSG', pct(latest.ihsg_return_pct), Number(latest.ihsg_return_pct) >= 0 ? 'text-teal' : 'text-red-400', 'Periode yang sama') + trackCard('Selisih angka', pct(alpha), alpha !== null && alpha >= 0 ? 'text-gold-light' : 'text-red-400', 'Bukan return portofolio atau jaminan hasil');
+        document.getElementById('trackChartNote').textContent = 'Indeks akumulasi dari data mingguan terpublikasi. TII memakai rata-rata P/L sinyal closed, bukan return portofolio.';
+        renderTrackChart(data);
+        document.getElementById('journalWeeks').innerHTML = data.slice(0, 6).map(r => '<button data-track-week="' + r.week_start + '" class="rounded-lg border border-navy-line px-3 py-2 text-xs text-ink/65 hover:border-gold/50">' + shortDate(r.week_start) + '</button>').join('');
+        document.querySelectorAll('[data-track-week]').forEach(btn => btn.addEventListener('click', () => renderJournalWeek(btn.dataset.trackWeek)));
+        await renderJournalWeek(data[0].week_start);
+        await renderPortfolio();
+      } catch {
+        content.classList.add('hidden'); empty.classList.remove('hidden');
+      }
+    }
+
+    loadTrackRecord();
 
     /* =====================================================================
        RUNNING TICKER, harga IDX dari /api/quotes (Yahoo, delayed, cached edge)

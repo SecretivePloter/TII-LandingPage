@@ -250,3 +250,35 @@ Setelah domain aktif, update 2 hal biar SEO rapi:
 
 Kalau mentok di langkah mana pun, catat pesan error persisnya (screenshot) — itu biasanya
 langsung nunjuk penyebabnya di daftar troubleshooting di atas.
+
+---
+
+## 8. Track record dari Google Sheets (CSV, tanpa membuka sheet ke publik)
+
+Track record tidak perlu diketik ulang di website. Tab rekomendasi Google Sheets yang
+sudah dipakai tim bisa dijadikan sumber data lewat file CSV. Website hanya menyimpan
+salinan data yang dibutuhkan untuk jurnal publik.
+
+### Sekali saja: update database
+1. Buka Supabase → **SQL Editor**.
+2. Jalankan ulang seluruh `supabase/schema.sql` dari project ini.
+
+### Setiap selesai update rekomendasi
+1. Di Google Sheets, buka tab rekomendasi.
+2. Klik **File → Download → Comma-separated values (.csv, current sheet)**.
+3. Buka `/admin.html`, login, lalu di bagian **Signal Journal dari Google Sheets** klik
+   **Pilih CSV**.
+4. Pilih file yang tadi diunduh. Data langsung menggantikan jurnal pada minggu yang
+   sama, jadi aman diimpor ulang setelah status sinyal berubah.
+
+Kolom yang dipakai: `TANGGAL REKOM`, `NAMA EMITEN`, `GAYA TRADE`, `ENTRY 1`,
+`AVG REKOM`, `TARGET`, `HIGH`, `SL`, `STATUS`, `TANGGAL DONE`, `KETERANGAN`,
+dan `GAIN/LOSS %`. Kolom `GAIN/LOSS %` selalu diprioritaskan sebagai hasil aktual.
+Kolom opsional `HARGA EXIT REAL` bisa ditambahkan bila ada posisi yang ditutup manual;
+jika ada, itulah yang dipakai sebagai dasar P/L.
+
+**Cara hitung yang ditampilkan:** `DONE TP` dihitung dari target dibanding entry rata-rata,
+sementara `DONE SL` dihitung dari stop loss dibanding entry rata-rata. `HIGH` hanya konteks,
+bukan profit karena bukan harga exit yang pasti. IHSG ditarik sebagai pembanding mingguan dari
+data penutupan Yahoo Finance saat impor. Posisi `REKOM BARU` tetap muncul sebagai `OPEN` dan
+belum masuk perhitungan hasil sampai selesai.
